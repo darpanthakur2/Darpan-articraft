@@ -347,4 +347,82 @@ var FW={
 G.FW=FW;
 function stepFW(dt){
   for(var i=R.length-1;i>=0;i--){
-    var r=R[i];r.x+=r.vx*dt;r.y+=r.vy*dt;
+    var r=R[i];r.x+=r.vx*dt;r.y+=r.vy*dt;r.vy+=(r.fast?260:210)*dt;
+    spawn(r.x,r.y,(Math.random()-.5)*20,20+Math.random()*30,.45,"#ffb347",1.4,0,.96);
+    if(r.vy>-60||r.y<=r.ty){
+      burst(r.x,r.y,r.c,r.k);SFX.boom(.35);if(Math.random()<.5)SFX.crackle(6);R.splice(i,1);
+    }
+  }
+  for(var j=GB.length-1;j>=0;j--){
+    var b=GB[j];b.t+=dt;
+    if(!b.boomed){
+      spawn(b.x+6,392-8,(Math.random()-.5)*40,-40-Math.random()*40,.35,"#ffd36a",1.6,0,.9);
+      if(b.t>=b.fuse){
+        b.boomed=true;b.t=0;flash=.7;shake=14;SFX.boom(1.6);
+        for(var k=0;k<90;k++){var a=Math.random()*Math.PI*2,v=60+Math.random()*260;spawn(b.x,392,Math.cos(a)*v,Math.sin(a)*v*.7-80,.9+Math.random()*.6,k%3?"#ff3b3b":"#ffcf4a",2.6,300,.95);}
+      }
+    }else if(b.t>.6){GB.splice(j,1);}
+  }
+  for(var c=CH.length-1;c>=0;c--){
+    var ch=CH[c];ch.t+=dt;ch.r+=dt*26;
+    for(var q=0;q<3;q++)spawn(ch.x+Math.cos(ch.r)*8,396+Math.sin(ch.r)*3,Math.cos(ch.r+1.5)*140+(Math.random()-.5)*30,-30-Math.random()*70,.5,pick(["#ffd36a","#ff8a1f","#fff2c9"]),1.6,160,.94);
+    if(ch.t>3.2)CH.splice(c,1);
+  }
+  for(var s=SP.length-1;s>=0;s--){
+    var sp=SP[s];sp.t+=dt;
+    for(var z=0;z<5;z++){var a2=Math.random()*Math.PI*2,v2=40+Math.random()*90;spawn(AX+22,GY-34,Math.cos(a2)*v2,Math.sin(a2)*v2-20,.5+Math.random()*.3,pick(["#fff2c9","#ffd36a","#ffffff"]),1.5,120,.93);}
+    if(sp.t>4.5)SP.splice(s,1);
+  }
+  for(var p=P.length-1;p>=0;p--){
+    var q2=P[p];q2.l-=dt;if(q2.l<=0){P.splice(p,1);continue;}
+    q2.vx*=q2.d;q2.vy=q2.vy*q2.d+q2.g*dt;q2.x+=q2.vx*dt;q2.y+=q2.vy*dt;
+  }
+  if(P.length>2400)P.splice(0,P.length-2400);
+  flash=Math.max(0,flash-dt*1.6);shake=Math.max(0,shake-dt*30);
+}
+G.fwCount=function(){return R.length+GB.length+CH.length};
+G.cvParts={P:P,R:R,GB:GB,CH:CH,SP:SP,COLS:COLS};
+G.stepFW=stepFW;
+G.getFlash=function(){return flash};
+G.getShake=function(){return shake};
+G.burst=burst;
+window.__G=G;
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var G=window.__G,$=G.$;
+var PXM=12,GOAL=2000,W=800,H=440,GY=372,AX=250;
+var cv=$("cv"),ctx=cv.getContext("2d");
+var V=G.cvParts;
+G.CLOTH={
+  kurta:{name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
+  saree:{name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
+  lehenga:{name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"},
+  sherwani:{name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"}
+};
+function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
+var sky=ctx.createLinearGradient(0,0,0,340);
+sky.addColorStop(0,"#07030f");sky.addColorStop(.55,"#251042");sky.addColorStop(1,"#6a2a62");
+var stars=[];for(var i=0;i<90;i++)stars.push({x:rnd(i,1)*W,y:rnd(i,2)*230,r:.4+rnd(i,3)*1.1,p:rnd(i,4)*6});
+var WALLS=["#e0912c","#c4285f","#14948a","#6c3ec0","#d96a2a","#b0306f"];
+var tt=0,phase=0,moving=false,walkHeld=false,runHeld=false,keyW=false,keyR=false;
+
+function glow(x,y,r,col,a){
+  var g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(255,160,40,0)");
+  ctx.globalAlpha=a;ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.globalAlpha=1;
+}
+function diya(x,y,sc,kind){
+  var col=kind==="brass"?"#d9a441":kind==="kandil"?"#ff6a3d":"#b5562a";
+  ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,7*sc,3.4*sc,0,0,Math.PI);ctx.fill();
+  ctx.fillStyle="#ffb347";var f=1+Math.sin(tt*9+x*.7)*.18;
+  ctx.beginPath();ctx.ellipse(x,y-4*sc*f,2*sc,4.6*sc*f,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#fff3c4";ctx.beginPath();ctx.ellipse(x,y-3*sc,.9*sc,2.2*sc,0,0,Math.PI*2);ctx.fill();
+}
+function lampTypes(){var l=G.S.lamps,a=[],i;for(i=0;i<l.kandil;i++)a.push("kandil");for(i=0;i<l.brass;i++)a.push("brass");for(i=0;i<l.clay;i++)a.push("clay");return a;}
+
+function drawSky(wp){
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,350);
+  for(var i=0;i<stars.length;i++){var s=stars[i];ctx.globalAlpha=.4+.6*Math.abs(Math.sin(tt*1.2+s.p));ctx.fillStyle="#fff";ctx.fillRect(((s.x-wp*.02)%W+W)%W,s.y,s.r,s.r);}
+  ctx
