@@ -3,32 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Darpan's Artifact</title>
+    <title>Darpan's Game Artifact</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
-            text-align: center;
-            padding: 50px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #2a2a40);
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
         }
-        .container {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            max-width: 600px;
-            margin: auto;
+        .game-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            backdrop-filter: blur(4px);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
         }
         h1 {
-            color: #4a90e2;
+            color: #00ffcc;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #b0b0c3;
+            font-size: 1.1rem;
+        }
+        .btn {
+            background-color: #00ffcc;
+            color: #1e1e2f;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.2s;
+        }
+        .btn:hover {
+            background-color: #00cc99;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Welcome to My Artifact</h1>
-        <p>This page is hosted live on GitHub Pages for everyone to view!</p>
+
+    <div class="game-container">
+        <h1>My Live Game Artifact</h1>
+        <p>Your game is now hosted live and accessible to anyone via your custom link!</p>
+        <button class="btn" onclick="alert('Game is active and running!')">Play Game</button>
     </div>
+
 </body>
 </html>
