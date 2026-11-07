@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Deepotsav Gali</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Mukta:wght@400;600;700&display=swap">
+<style>
+:root{
+  --night:#150b22; --night2:#21133a; --panel:#2a1a47; --line:#4a3470;
+  --ink:#fbf0dc; --muted:#c3b3d6; --marigold:#ffc83d; --saffron:#ff8a1f;
+  --rose:#e8317a; --peacock:#19b3a6; --good:#7ddc8a; --warn:#ff9d6b;
+  --display:"Yatra One","Mukta",Georgia,serif; --body:"Mukta","Noto Sans Devanagari",system-ui,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{background:var(--night)}
+body{margin:0;color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.45;
+  padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+  background:radial-gradient(1200px 500px at 50% -10%,#3a1d63 0%,var(--night) 60%) fixed var(--night)}
+.wrap{max-width:980px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance}
+h1{font-size:clamp(24px,5vw,34px);color:var(--marigold);letter-spacing:.01em}
+h2{font-size:20px;color:var(--marigold)}
+h3{font-size:16px}
+p{margin:0}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--marigold);outline-offset:2px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.top small{display:block;color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.chip b{color:var(--marigold)}
+.scene{position:relative;border-radius:14px;overflow:hidden;border:1px solid var(--line);background:#0d0618;touch-action:manipulation}
+canvas{display:block;width:100%;height:auto;aspect-ratio:20/11}
+.toast{position:absolute;left:50%;top:10px;transform:translateX(-50%);max-width:90%;background:rgba(21,11,34,.88);border:1px solid var(--marigold);border-radius:10px;padding:6px 12px;font-weight:600;text-align:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.toast.on{opacity:1}
+.walkbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:9px 14px;font-weight:700;min-height:42px;user-select:none;-webkit-user-select:none;touch-action:none}
+.btn:hover{border-color:var(--marigold)}
+.btn.pri{background:linear-gradient(180deg,var(--saffron),#e0680a);border-color:#ffb05a;color:#2b1200}
+.btn.pri:active,.btn.hold{filter:brightness(1.15);transform:translateY(1px)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.tgl{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
+.prog{flex:1 1 220px;min-width:180px}
+.track{position:relative;height:12px;border-radius:99px;background:var(--night2);border:1px solid var(--line)}
+.fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:linear-gradient(90deg,var(--saffron),var(--marigold))}
+.mk{position:absolute;top:-3px;width:2px;height:18px;background:var(--line)}
+.marks{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:3px;font-variant-numeric:tabular-nums}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
+.tab{flex:0 0 auto;background:transparent;border:1px solid var(--line);border-radius:10px;padding:8px 14px;font-weight:700;color:var(--muted)}
+.tab[aria-selected="true"]{background:var(--panel);color:var(--marigold);border-color:var(--marigold)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px}
+.card{background:var(--night2);border:1px solid var(--line);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.card .row{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.muted{color:var(--muted)}
+.price{color:var(--marigold);font-weight:700;font-variant-numeric:tabular-nums}
+.sw{width:34px;height:34px;border-radius:9px;flex:0 0 auto;border:1px solid rgba(255,255,255,.25)}
+.task{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;background:var(--night2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.task.act{border-color:var(--marigold);box-shadow:0 0 0 1px var(--marigold) inset}
+.task.done{opacity:.75}
+.tn{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:var(--panel);font-weight:700;border:1px solid var(--line)}
+.task.done .tn{background:var(--good);color:#10331a;border-color:var(--good)}
+.tbody{min-width:0}
+.tbody small{color:var(--muted);display:block}
+.live{font-weight:700;color:var(--marigold);font-variant-numeric:tabular-nums}
+.diyas{display:flex;flex-wrap:wrap;gap:8px}
+.diya{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:var(--night2);display:grid;place-items:center;padding:0}
+.diya.lit{border-color:var(--marigold);background:#4a2a10;box-shadow:0 0 14px 2px rgba(255,170,40,.55)}
+.shrines{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.shrine{align-items:center;text-align:center}
+.shrine svg{width:96px;height:96px}
+.mantra{font-size:18px;color:var(--marigold)}
+.steps{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.steps .btn{padding:7px 10px;min-height:38px;font-size:14px}
+.pips{display:flex;gap:6px;justify-content:center}
+.pip{width:10px;height:10px;border-radius:50%;background:var(--night);border:1px solid var(--line)}
+.pip.on{background:var(--marigold);border-color:var(--marigold)}
+.blessed{color:var(--good);font-weight:700}
+.chat{display:grid;grid-template-columns:200px 1fr;gap:12px}
+.rooms{display:flex;flex-direction:column;gap:6px}
+.room{text-align:left;background:var(--night2);border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+.room[aria-pressed="true"]{border-color:var(--marigold);color:var(--marigold)}
+.log{height:240px;overflow-y:auto;background:var(--night);border:1px solid var(--line);border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px}
+.msg{overflow-wrap:anywhere}
+.msg .who{font-weight:700;margin-right:6px}
+.msg.sys{color:var(--muted);font-style:italic}
+.send{display:flex;gap:8px;margin-top:8px}
+input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.songs{display:flex;flex-direction:column;gap:8px}
+.song{display:flex;align-items:center;gap:10px;background:var(--night2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.song.on{border-color:var(--marigold)}
+.song .meta{flex:1;min-width:0}
+.bars{display:flex;align-items:flex-end;gap:2px;height:18px}
+.bars i{width:3px;background:var(--marigold);height:4px;border-radius:2px}
+.playing .bars i{animation:eq .7s ease-in-out infinite alternate}
+.playing .bars i:nth-child(2){animation-delay:.15s}.playing .bars i:nth-child(3){animation-delay:.3s}.playing .bars i:nth-child(4){animation-delay:.45s}
+@keyframes eq{to{height:18px}}
+.end{display:none;text-align:center;border:1px solid var(--marigold);border-radius:14px;padding:16px;background:linear-gradient(180deg,#3b1d52,var(--panel))}
+.end.on{display:block}
+@media (max-width:640px){.chat{grid-template-columns:1fr}.rooms{flex-direction:row;flex-wrap:wrap}.task{grid-template-columns:30px 1fr}.task .btn{grid-column:1/-1}}
+@media (prefers-reduced-motion:reduce){.playing .bars i{animation:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <h1>Deepotsav Gali</h1>
+      <small>Shubh Deepawali - Walk the lit street, pray, shop and burst crackers</small>
+      <small>Created by <b style="color:var(--marigold)">Darpan Thakur</b></small>
+    </div>
+    <div class="chips" aria-live="polite">
+      <span class="chip">Coins: <b id="coins">0</b></span>
+      <span class="chip">Dist: <b id="dist">0</b> m / 2000</span>
+      <span class="chip">Time: <b id="timer">--</b></span>
+    </div>
+  </header>
+
+  <div class="scene">
+    <canvas id="cv" width="1200" height="660" aria-label="Night street decorated for Diwali with lamps, rangoli and fireworks"></canvas>
+    <div class="toast" id="toast" role="status"></div>
+  </div>
+
+  <div class="walkbar">
+    <button class="btn pri" id="walk" type="button">Walk</button>
+    <button class="btn" id="run" type="button">Run</button>
+    <label class="tgl"><input type="checkbox" id="auto"> Keep walking</label>
+    <div class="prog">
+      <div class="track"><div class="fill" id="fill"></div>
+        <i class="mk" style="left:20%"></i><i class="mk" style="left:40%"></i><i class="mk" style="left:60%"></i><i class="mk" style="left:80%"></i>
+      </div>
+      <div class="marks"><span>Start</span><span>500 m</span><span>1 km</span><span>1.5 km</span><span>Mela gate 2 km</span></div>
+    </div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Festival menu">
+    <button class="tab" role="tab" id="t-tasks" aria-selected="true" data-p="tasks">Tasks</button>
+    <button class="tab" role="tab" id="t-crackers" aria-selected="false" data-p="crackers">Crackers</button>
+    <button class="tab" role="tab" id="t-mandir" aria-selected="false" data-p="mandir">Mandir</button>
+    <button class="tab" role="tab" id="t-shop" aria-selected="false" data-p="shop">Shop</button>
+    <button class="tab" role="tab" id="t-chat" aria-selected="false" data-p="chat">Rooms</button>
+    <button class="tab" role="tab" id="t-songs" aria-selected="false" data-p="songs">Songs</button>
+  </div>
+
+  <section class="panel" id="p-tasks" role="tabpanel" aria-labelledby="t-tasks">
+    <div>
+      <h2>Five festival tasks</h2>
+      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each.</p>
+    </div>
+    <div id="tasklist" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="end" id="end"><h2>Shubh Deepawali!</h2><p id="endtxt" class="muted"></p><p style="margin-top:10px"><button class="btn pri" id="again" type="button">Play again</button></p></div>
+  </section>
+
+  <section class="panel" id="p-crackers" role="tabpanel" aria-labelledby="t-crackers" hidden>
+    <div><h2>Crackers</h2><p class="muted">Keys 1 to 5 burst them too. Buy more in the Shop. Rooms friends see your rockets in their sky.</p></div>
+    <div class="grid" id="crgrid"></div>
+  </section>
+
+  <section class="panel" id="p-mandir" role="tabpanel" aria-labelledby="t-mandir" hidden>
+    <div><h2>Mandir</h2><p class="muted">Offer a flower, light the diya and ring the bell at each shrine to receive a blessing: +10% coins on every task.</p></div>
+    <div class="shrines" id="shrines"></div>
+  </section>
+
+  <section class="panel" id="p-shop" role="tabpanel" aria-labelledby="t-shop" hidden>
+    <div><h2>Bazaar</h2><p class="muted">Spend the coins you earn from tasks.</p></div>
+    <div class="tabs" id="shoptabs">
+      <button class="tab" aria-selected="true" data-c="clothes">Clothes</button>
+      <button class="tab" aria-selected="false" data-c="lamps">Lamps</button>
+      <button class="tab" aria-selected="false" data-c="crackers">Crackers</button>
+    </div>
+    <div class="grid" id="shopgrid"></div>
+  </section>
+
+  <section class="panel" id="p-chat" role="tabpanel" aria-labelledby="t-chat" hidden>
+    <div><h2>Festival rooms</h2><p class="muted" id="chatstat">Pick a room to join.</p></div>
+    <div class="chat">
+      <div class="rooms" id="rooms"></div>
+      <div>
+        <div class="log" id="log" aria-live="polite"></div>
+        <form class="send" id="sendf">
+          <input type="text" id="nick" maxlength="14" placeholder="Your name" style="flex:0 0 120px" aria-label="Your name">
+          <input type="text" id="msg" maxlength="140" placeholder="Say Happy Diwali..." aria-label="Message" autocomplete="off">
+          <button class="btn pri" type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-songs" role="tabpanel" aria-labelledby="t-songs" hidden>
+    <div><h2>Diwali tunes</h2><p class="muted">Instrumental festival music made inside the page, in ragas used for evening aarti. Tap a tune to play it while you walk.</p></div>
+    <div class="songs" id="songs"></div>
+    <div class="walkbar"><label class="tgl">Volume <input type="range" id="vol" min="0" max="100" value="60" aria-label="Music volume"></label></div>
+  </section>
+</div>
+<script>
+(function(){
+"use strict";
+var $=function(id){return document.getElementById(id)};
+var PXM=12, GOAL=2000, W=800, H=440, GY=372, AX=250;
+
+var S={coins:50,dist:0,walked:0,gateDone:false,
+  inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},
+  lamps:{clay:0,brass:0,kandil:0},own:['kurta'],wear:'kurta',blessed:{},
+  bursts:0,diyas:0,ti:0,t0:null,base:{walked:0,bursts:0,diyas:0},res:[]}, KEY="deepotsav-gali-v1";
+try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&o.inv&&o.lamps){S=Object.assign(S,o);}}}catch(e){}
+var saveT=0;
+function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}},400);}
+var G={S:S,save:save,$:$};
+function setS(n){S=n;G.S=n;}
+G.setS=setS;
+
+var toastT=0;
+function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove("on")},2600);}
+G.toast=toast;
+
+var AC=null,master=null,sfxG=null,musG=null,nbuf=null;
+function ac(){
+  if(AC){if(AC.state==="suspended")AC.resume();return AC;}
+  var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+  AC=new C();master=AC.createGain();master.gain.value=.9;master.connect(AC.destination);
+  sfxG=AC.createGain();sfxG.gain.value=.8;sfxG.connect(master);
+  musG=AC.createGain();musG.gain.value=.6*.5;musG.connect(master);
+  nbuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);var d=nbuf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;
+  return AC;
+}
+G.ac=ac;
+function noise(t,dur,f0,f1,vol,type){
+  var s=AC.createBufferSource();s.buffer=nbuf;s.loop=true;
+  var f=AC.createBiquadFilter();f.type=type||"lowpass";f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),t+dur);
+  var g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  s.connect(f);f.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur+.05);
+}
+function tone(t,dur,f0,f1,vol,type,dest){
+  var o=AC.createOscillator();o.type=type||"sine";o.frequency.setValueAtTime(f0,t);
+  if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  var g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g);g.connect(dest||sfxG);o.start(t);o.stop(t+dur+.05);
+}
+var SFX={
+  boom:function(sz){if(!ac())return;var t=AC.currentTime;noise(t,.5+.5*sz,2400,160,.9*Math.min(1,.5+sz*.4));tone(t,.45,110,38,.9*Math.min(1,.5+sz*.4));},
+  pop:function(){if(!ac())return;var t=AC.currentTime;noise(t,.18,3000,400,.5);tone(t,.12,240,90,.35);},
+  whistle:function(d){if(!ac())return;var t=AC.currentTime;tone(t,d,500,2400,.12,"sine");},
+  crackle:function(n){if(!ac())return;var t=AC.currentTime;for(var i=0;i<n;i++)noise(t+Math.random()*1.2,.05,5000,1500,.3,"highpass");},
+  bell:function(){if(!ac())return;var t=AC.currentTime;[880,1320,1760,2210].forEach(function(f,i){tone(t,1.6-i*.2,f,f*.995,.12/(i+1),"sine");});},
+  clink:function(){if(!ac())return;var t=AC.currentTime;tone(t,.25,1568,1500,.12,"triangle");tone(t+.07,.3,2093,2000,.1,"triangle");},
+  coin:function(){if(!ac())return;var t=AC.currentTime;tone(t,.12,988,988,.12,"square");tone(t+.09,.3,1319,1319,.12,"square");},
+  fizz:function(){if(!ac())return;var t=AC.currentTime;noise(t,.4,6000,2500,.12,"highpass");}
+};
+G.SFX=SFX;
+
+var SONGS=[
+ {id:"aarti",name:"Deep Aarti",desc:"Slow evening raga, bells and drone",bpm:70,root:196,scale:[0,1,3,5,7,8,10],
+  mel:[[4,1],[3,.5],[2,.5],[3,1],[2,.5],[1,.5],[2,1],[1,1],[0,2],[0,1],[1,1],[2,1.5],[3,.5],[4,1],[5,.5],[4,.5],[3,1],[2,1],[1,1],[0,2]],tab:[1,0,0,0,.4,0,.6,0]},
+ {id:"phool",name:"Phooljhari Dhun",desc:"Bright and bouncy, for sparkler time",bpm:126,root:220,scale:[0,2,4,6,7,9,11],
+  mel:[[0,.5],[2,.5],[4,.5],[2,.5],[5,.5],[4,.5],[2,.5],[0,.5],[1,.5],[3,.5],[5,.5],[3,.5],[6,.5],[5,.5],[4,.5],[2,.5],[4,.5],[5,.5],[6,.5],[7,.5],[8,1],[6,.5],[4,.5],[2,1],[0,1]],tab:[1,.3,.5,.3,.8,.3,.5,.5]},
+ {id:"laxmi",name:"Laxmi Pooja Taal",desc:"Steady dholak groove for the pooja hour",bpm:96,root:196,scale:[0,2,4,5,7,9,10],
+  mel:[[2,1],[4,.5],[5,.5],[4,1],[2,1],[0,1],[2,.5],[4,.5],[5,1],[7,1],[5,1],[4,2],[5,.5],[4,.5],[2,1],[0,1],[2,1],[0,2]],tab:[1,0,.4,0,.7,0,.4,.4]}
+];
+var mus={on:null,timer:0,nextN:0,mi:0,nextB:0,bc:0,drone:[],vol:.6};
+function pluck(t,f,dur){
+  var o=AC.createOscillator(),o2=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();
+  o.type="sawtooth";o2.type="triangle";o.frequency.value=f;o2.frequency.value=f*1.003;
+  lp.type="lowpass";lp.frequency.setValueAtTime(3200,t);lp.frequency.exponentialRampToValueAtTime(500,t+dur);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(musG);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);
+}
+function drum(t,v,hi){
+  if(hi){noise(t,.06,hi?4500:900,1800,.12*v,"highpass");return;}
+  var o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(62,t+.18);
+  g.gain.setValueAtTime(.45*v,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(musG);o.start(t);o.stop(t+.35);
+}
+function stopDrone(){mus.drone.forEach(function(o){try{o.stop()}catch(e){}});mus.drone=[];}
+function startDrone(s){
+  stopDrone();var t=AC.currentTime;
+  [s.root/2,s.root*0.75].forEach(function(f){var o=AC.createOscillator(),g=AC.createGain();o.type="triangle";o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(musG);o.start(t);mus.drone.push(o);});
+}
+function tick(){
+  var s=mus.on;if(!s||!AC)return;
+  var bd=60/s.bpm,now=AC.currentTime;
+  while(mus.nextN<now+.35){
+    var n=s.mel[mus.mi%s.mel.length],deg=n[0],b=n[1],oct=Math.floor(deg/7),idx=deg%7;
+    var f=s.root*2*Math.pow(2,(s.scale[idx]+12*oct)/12);
+    pluck(mus.nextN,f,Math.max(.4,b*bd*1.8));
+    mus.nextN+=b*bd;mus.mi++;
+  }
+  while(mus.nextB<now+.35){
+    var p=s.tab[mus.bc%s.tab.length];
+    if(p>0){drum(mus.nextB,p,false);}
+    if(mus.bc%2===1)drum(mus.nextB,.6,true);
+    mus.nextB+=bd/2;mus.bc++;
+  }
+}
+G.music={
+  songs:SONGS,
+  play:function(id){
+    if(!ac())return;
+    var s=SONGS.filter(function(x){return x.id===id})[0];if(!s)return;
+    clearInterval(mus.timer);mus.on=s;mus.mi=0;mus.bc=0;mus.nextN=AC.currentTime+.1;mus.nextB=mus.nextN;
+    startDrone(s);mus.timer=setInterval(tick,90);tick();
+  },
+  stop:function(){clearInterval(mus.timer);mus.on=null;stopDrone();},
+  cur:function(){return mus.on?mus.on.id:null;},
+  vol:function(v){mus.vol=v;ac();musG.gain.value=v*.5;}
+};
+
+var P=[],R=[],GB=[],CH=[],SP=[],flash=0,shake=0;
+var COLS=["#ffcf4a","#ff6a3d","#ff3d81","#8f5bff","#2fd7c4","#7dff6a","#4aa8ff","#fff2c9"];
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function spawn(x,y,vx,vy,life,col,size,g,drag){P.push({x:x,y:y,vx:vx,vy:vy,l:life,m:life,c:col,s:size||2,g:g==null?60:g,d:drag==null?.985:drag});}
+function burst(x,y,col,kind){
+  var n=kind==="ring"?46:kind==="willow"?60:70,sp=kind==="willow"?110:150,c2=pick(COLS);
+  for(var i=0;i<n;i++){
+    var a=kind==="ring"?i/n*Math.PI*2:Math.random()*Math.PI*2;
+    var v=kind==="ring"?sp:sp*(.3+Math.random()*.8);
+    spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,kind==="willow"?2.2:1.3+Math.random()*.5,i%5===0?c2:col,kind==="willow"?1.6:2.2,kind==="willow"?70:50,kind==="willow"?.97:.975);
+  }
+  flash=Math.max(flash,.18);
+}
+function launch(x,col,kind){
+  var ty=60+Math.random()*110;
+  R.push({x:x,y:GY+26,vx:(Math.random()-.5)*14,vy:-(300+Math.random()*60),ty:ty,c:col,k:kind});
+  SFX.whistle(.7);
+}
+var FW={
+  rocket:function(remote,xf){
+    var x=xf!=null?xf*W:120+Math.random()*560;launch(x,pick(COLS),pick(["peony","ring","willow"]));
+  },
+  laxmi:function(remote,xf){
+    var x=xf!=null?xf*W:AX+110;GB.push({x:x,t:0,fuse:1.1,boomed:false});SFX.fizz();
+  },
+  shots:function(remote,xf){
+    var base=xf!=null?xf*W:200+Math.random()*400;
+    for(var i=0;i<5;i++)(function(i){setTimeout(function(){
+      var x=base+(i-2)*70,col=COLS[(i*2)%COLS.length];
+      R.push({x:x,y:GY+26,vx:0,vy:-(380+Math.random()*50),ty:90+Math.random()*70,c:col,k:"peony",fast:true});SFX.pop();
+    },i*230);})(i);
+  },
+  chakri:function(remote,xf){
+    var x=xf!=null?xf*W:AX+100;CH.push({x:x,t:0,r:0});SFX.fizz();
+  },
+  spark:function(){SP.push({t:0});SFX.fizz();}
+};
+G.FW=FW;
+function stepFW(dt){
+  for(var i=R.length-1;i>=0;i--){
+    var r=R[i];r.x+=r.vx*dt;r.y+=r.vy*dt;r.vy+=(r.fast?260:210)*dt;
+    spawn(r.x,r.y,(Math.random()-.5)*20,20+Math.random()*30,.45,"#ffb347",1.4,0,.96);
+    if(r.vy>-60||r.y<=r.ty){
+      burst(r.x,r.y,r.c,r.k);SFX.boom(.35);if(Math.random()<.5)SFX.crackle(6);R.splice(i,1);
+    }
+  }
+  for(var j=GB.length-1;j>=0;j--){
+    var b=GB[j];b.t+=dt;
+    if(!b.boomed){
+      spawn(b.x+6,392-8,(Math.random()-.5)*40,-40-Math.random()*40,.35,"#ffd36a",1.6,0,.9);
+      if(b.t>=b.fuse){
+        b.boomed=true;b.t=0;flash=.7;shake=14;SFX.boom(1.6);
+        for(var k=0;k<90;k++){var a=Math.random()*Math.PI*2,v=60+Math.random()*260;spawn(b.x,392,Math.cos(a)*v,Math.sin(a)*v*.7-80,.9+Math.random()*.6,k%3?"#ff3b3b":"#ffcf4a",2.6,300,.95);}
+      }
+    }else if(b.t>.6){GB.splice(j,1);}
+  }
+  for(var c=CH.length-1;c>=0;c--){
+    var ch=CH[c];ch.t+=dt;ch.r+=dt*26;
+    for(var q=0;q<3;q++)spawn(ch.x+Math.cos(ch.r)*8,396+Math.sin(ch.r)*3,Math.cos(ch.r+1.5)*140+(Math.random()-.5)*30,-30-Math.random()*70,.5,pick(["#ffd36a","#ff8a1f","#fff2c9"]),1.6,160,.94);
+    if(ch.t>3.2)CH.splice(c,1);
+  }
+  for(var s=SP.length-1;s>=0;s--){
+    var sp=SP[s];sp.t+=dt;
+    for(var z=0;z<5;z++){var a2=Math.random()*Math.PI*2,v2=40+Math.random()*90;spawn(AX+22,GY-34,Math.cos(a2)*v2,Math.sin(a2)*v2-20,.5+Math.random()*.3,pick(["#fff2c9","#ffd36a","#ffffff"]),1.5,120,.93);}
+    if(sp.t>4.5)SP.splice(s,1);
+  }
+  for(var p=P.length-1;p>=0;p--){
+    var q2=P[p];q2.l-=dt;if(q2.l<=0){P.splice(p,1);continue;}
+    q2.vx*=q2.d;q2.vy=q2.vy*q2.d+q2.g*dt;q2.x+=q2.vx*dt;q2.y+=q2.vy*dt;
+  }
+  if(P.length>2400)P.splice(0,P.length-2400);
+  flash=Math.max(0,flash-dt*1.6);shake=Math.max(0,shake-dt*30);
+}
+G.fwCount=function(){return R.length+GB.length+CH.length};
+G.cvParts={P:P,R:R,GB:GB,CH:CH,SP:SP,COLS:COLS};
+G.stepFW=stepFW;
+G.getFlash=function(){return flash};
+G.getShake=function(){return shake};
+G.burst=burst;
+window.__G=G;
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var G=window.__G,$=G.$;
+var PXM=12,GOAL=2000,W=800,H=440,GY=372,AX=250;
+var cv=$("cv"),ctx=cv.getContext("2d");
+var V=G.cvParts;
+G.CLOTH={
+  kurta:{name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
+  saree:{name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
+  lehenga:{name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"},
+  sherwani:{name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"}
+};
+function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
+var sky=ctx.createLinearGradient(0,0,0,340);
+sky.addColorStop(0,"#07030f");sky.addColorStop(.55,"#251042");sky.addColorStop(1,"#6a2a62");
+var stars=[];for(var i=0;i<90;i++)stars.push({x:rnd(i,1)*W,y:rnd(i,2)*230,r:.4+rnd(i,3)*1.1,p:rnd(i,4)*6});
+var WALLS=["#e0912c","#c4285f","#14948a","#6c3ec0","#d96a2a","#b0306f"];
+var tt=0,phase=0,moving=false,walkHeld=false,runHeld=false,keyW=false,keyR=false;
+
+function glow(x,y,r,col,a){
+  var g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(255,160,40,0)");
+  ctx.global
