@@ -57,6 +57,14 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:20/11}
 .sfill{width:100%;background:linear-gradient(90deg,var(--peacock),#7dff6a)}
 .stam.low .sfill{background:linear-gradient(90deg,var(--warn),var(--rose))}
 a.btn{display:inline-flex;align-items:center;text-decoration:none;touch-action:auto}
+.lb{margin:0;padding-left:24px;display:flex;flex-direction:column;gap:5px;font-variant-numeric:tabular-nums;text-align:left}
+.lb li{padding-right:2px}
+.lb li .t{float:right;font-weight:700}
+.lb li.me{color:var(--marigold)}
+.over[hidden]{display:none}
+.over{position:fixed;inset:0;z-index:50;background:rgba(8,3,16,.84);display:flex;align-items:center;justify-content:center;padding:16px}
+.overbox{background:var(--panel);border:1px solid var(--marigold);border-radius:16px;padding:20px;width:min(480px,100%);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:12px;text-align:center}
+.big{font-family:var(--display);font-size:46px;line-height:1.1;color:var(--marigold);font-variant-numeric:tabular-nums}
 .mk{position:absolute;top:-3px;width:2px;height:18px;background:var(--line)}
 .marks{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:3px;font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
@@ -124,7 +132,10 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     <div class="chips" aria-live="polite">
       <span class="chip">🪙 <b id="coins">0</b></span>
       <span class="chip">🚶 <b id="dist">0</b> m / 4000</span>
-      <span class="chip">⏱ <b id="timer">--</b></span>
+      <span class="chip" title="Time on the current task">⏱ <b id="timer">--</b></span>
+      <span class="chip" title="Run clock: starts at your first step, stops at the Mela gate">🏁 <b id="clock">0:00.0</b></span>
+      <span class="chip" title="Current speed">🏃 <b id="spd">0.0</b> m/s</span>
+      <span class="chip" title="Speed bonus from your outfit">👗 <b id="boost">+0%</b></span>
     </div>
   </header>
 
@@ -134,12 +145,13 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   </div>
 
   <div class="walkbar">
-    <button class="btn pri" id="walk" type="button">Walk ▶</button>
-    <button class="btn" id="run" type="button">Run ⏩</button>
+    <button class="btn pri" id="walk" type="button">Step ▶</button>
+    <button class="btn" id="run" type="button">Sprint ⏩</button>
     <span class="tgl" role="group" aria-label="Choose character">Character
       <button class="btn" id="gm" type="button" aria-pressed="true">Boy</button>
       <button class="btn" id="gf" type="button" aria-pressed="false">Girl</button>
     </span>
+    <button class="btn" id="restart" type="button">Restart run</button>
     <div class="stam" title="Running uses up stamina. Walking and resting refill it."><span>⚡ Stamina</span><div class="track"><div class="fill sfill" id="stam" style="width:100%"></div></div></div>
     <div class="prog">
       <div class="track"><div class="fill" id="fill"></div>
@@ -149,19 +161,21 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     </div>
   </div>
 
+  <p class="muted" id="hint" style="font-size:13px">Tap Step as fast as you can to build speed (keys: Left, Right, A, D or Space). Sprint taps give big bursts but use stamina. Holding a button only jogs slowly. A better outfit adds a small speed bonus, but your tapping decides how fast you are.</p>
   <div class="tabs" role="tablist" aria-label="Festival menu">
     <button class="tab" role="tab" id="t-tasks" aria-selected="true" data-p="tasks">Tasks</button>
     <button class="tab" role="tab" id="t-crackers" aria-selected="false" data-p="crackers">Crackers</button>
     <button class="tab" role="tab" id="t-mandir" aria-selected="false" data-p="mandir">Mandir</button>
     <button class="tab" role="tab" id="t-shop" aria-selected="false" data-p="shop">Shop</button>
     <button class="tab" role="tab" id="t-chat" aria-selected="false" data-p="chat">Rooms</button>
+    <button class="tab" role="tab" id="t-board" aria-selected="false" data-p="board">Leaderboard</button>
     <button class="tab" role="tab" id="t-songs" aria-selected="false" data-p="songs">Songs</button>
   </div>
 
   <section class="panel" id="p-tasks" role="tabpanel" aria-labelledby="t-tasks">
     <div>
-      <h2>Five festival tasks</h2>
-      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each. The street to the Mela gate is 4 km: running drains stamina, so mix walking and running.</p>
+      <h2>Ten festival tasks</h2>
+      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each. Tasks are optional side quests that pay coins for outfits with a small speed boost, but the leaderboard clock keeps running while you do them. The street is 4 km and the run ends at the Mela gate.</p>
     </div>
     <div id="tasklist" style="display:flex;flex-direction:column;gap:8px"></div>
     <div class="end" id="end"><h2>Shubh Deepawali!</h2><p id="endtxt" class="muted"></p><p style="margin-top:10px"><button class="btn pri" id="again" type="button">Play again</button></p></div>
@@ -202,6 +216,13 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     </div>
   </section>
 
+  <section class="panel" id="p-board" role="tabpanel" aria-labelledby="t-board" hidden>
+    <div><h2>Leaderboard</h2><p class="muted">Fastest runs to the Mela gate at 4 km. The clock starts on your first step, keeps running while you do tasks or shop, and stops at the gate.</p></div>
+    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
+      <div class="card"><h3>Everyone</h3><p class="muted" id="gstat">Open this tab to load the shared leaderboard.</p><ol class="lb" id="glist"></ol></div>
+      <div class="card"><h3>This device</h3><ol class="lb" id="llist"></ol></div>
+    </div>
+  </section>
   <section class="panel" id="p-songs" role="tabpanel" aria-labelledby="t-songs" hidden>
     <div><h2>Diwali tunes</h2><p class="muted">Instrumental festival tunes made inside the page, including original dhuns for Ganesh, Laxmi and Saraswati. Tap one to play it while you walk.</p></div>
     <div class="songs" id="songs"></div>
@@ -215,6 +236,20 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     </div>
     <div class="walkbar"><label class="tgl">Volume <input type="range" id="vol" min="0" max="100" value="60" aria-label="Music volume"></label></div>
   </section>
+</div>
+<div class="over" id="over" hidden role="dialog" aria-modal="true" aria-labelledby="overh">
+  <div class="overbox">
+    <h2 id="overh">Shubh Deepawali! You reached the Mela gate</h2>
+    <div class="big" id="overtime">0:00.0</div>
+    <p class="muted" id="overinfo"></p>
+    <form class="send" id="lbform" style="margin:0">
+      <input type="text" id="lbname" maxlength="14" placeholder="Your name" aria-label="Name for the leaderboard">
+      <button class="btn pri" id="lbsave" type="submit">Save time</button>
+    </form>
+    <p class="muted" id="lbmsg"></p>
+    <ol class="lb" id="overlist"></ol>
+    <button class="btn pri" id="runagain" type="button">Run again from 0</button>
+  </div>
 </div>
 <script>
 (function(){
@@ -514,6 +549,10 @@ G.CLOTH={
   bridal:{g:"f",shape:"lehenga",name:"Bridal lehenga",price:740,top:"#a50e2a",bot:"#c1121f",trim:"#ffcf4a"},
   rani:{g:"f",shape:"gown",name:"Rani gown and crown",price:950,top:"#4b1d8f",bot:"#4b1d8f",trim:"#ffd36a",crown:true}
 };
+["m","f"].forEach(function(g){
+  var ks=Object.keys(G.CLOTH).filter(function(k){return G.CLOTH[k].g===g;}).sort(function(a,b){return G.CLOTH[a].price-G.CLOTH[b].price;});
+  ks.forEach(function(k,i){G.CLOTH[k].tier=i;G.CLOTH[k].boost=1+i*.025;});
+});
 function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
 /* sky */
 var sky=ctx.createLinearGradient(0,0,0,340);
@@ -675,17 +714,38 @@ function drawFW(){
   }
   ctx.globalAlpha=1;ctx.textAlign="start";
 }
+var HOLDV=4,HOLDRUN=8,TAP=2.0,SPR=4.2,DECAY=1.0,VMAX=24;
+function boostOf(){var c=G.CLOTH[G.S.wear];return c&&c.boost?c.boost:1;}
+G.fmt=function(t){var d=Math.floor((t||0)*10),m=Math.floor(d/600),r=d%600,s=Math.floor(r/10);return m+":"+(s<10?"0":"")+s+"."+(r%10);};
+function tap(sprint){
+  var S=G.S;if(S.over)return;
+  if(typeof S.v!=="number")S.v=0;
+  var bo=boostOf();
+  if(!S.started){S.started=true;S.clock=S.clock||0;}
+  if(sprint&&!tired&&S.stam>0){S.v=Math.min(VMAX,S.v+SPR*bo);S.stam=Math.max(0,S.stam-3);S.runT=.7;if(S.stam<=0){tired=true;G.toast("Out of breath! Walk to recover.");}}
+  else S.v=Math.min(VMAX,S.v+TAP*bo);
+}
 var last=performance.now(),uiT=0;
 function frame(now){
-  var dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
-  var S=G.S,wantRun=runHeld||keyR,go=walkHeld||keyW||wantRun;
-  if(typeof S.stam!=="number")S.stam=100;
+  var rdt=(now-last)/1000,dt=Math.min(.05,rdt);last=now;tt+=dt;
+  var S=G.S;
+  if(typeof S.stam!=="number")S.stam=100;if(typeof S.v!=="number")S.v=0;if(typeof S.clock!=="number")S.clock=0;
+  var held=walkHeld||keyW,heldRun=runHeld||keyR,bo=boostOf();
   if(tired&&S.stam>=25)tired=false;
-  if(!tired&&wantRun&&S.stam<=0){tired=true;G.toast("Out of breath! Keep walking to recover.");}
-  var run=wantRun&&!tired;
-  var v=go?(run?WALKV*2:WALKV):0;moving=v>0;
-  if(run)S.stam=Math.max(0,S.stam-6*dt);else S.stam=Math.min(100,S.stam+(go?3:10)*dt);
+  var sprinting=heldRun&&!tired&&S.stam>0&&!S.over;
+  if(heldRun&&!tired&&S.stam<=0&&!S.over){tired=true;G.toast("Out of breath! Walk to recover.");}
+  if(!S.started&&(held||heldRun)&&!S.over)S.started=true;
+  var floor=S.over?0:(sprinting?HOLDRUN*bo:((held||heldRun)?HOLDV*bo:0));
+  S.v*=Math.exp(-DECAY*dt);
+  if(S.v<floor)S.v=floor;
+  if(S.v>VMAX)S.v=VMAX;
+  if(S.over)S.v=0;
+  var v=S.v;moving=v>.4;
+  if(sprinting){S.stam=Math.max(0,S.stam-6*dt);S.runT=.25;}else S.stam=Math.min(100,S.stam+(moving?2.5:8)*dt);
+  if(S.runT>0){S.runT-=dt;if(moving)S.ran=(S.ran||0)+v*dt;}
+  if(S.started&&!S.over&&rdt<1)S.clock+=rdt;
   if(moving){S.dist+=v*dt;S.walked+=v*dt;phase+=v*dt*.75;}
+  if(S.dist>GOAL)S.dist=GOAL;
   G.stepFW(dt);
   if(G.update)G.update(dt);
   var wp=S.dist*PXM,sh=G.getShake();
@@ -694,23 +754,25 @@ function frame(now){
   drawSky(wp);drawHouses(wp);drawRoad(wp);drawAvatar();drawFW();
   var fl=G.getFlash();if(fl>0){ctx.globalAlpha=Math.min(.55,fl*.6);ctx.fillStyle="#fff5d6";ctx.fillRect(-20,-20,W+40,H+40);ctx.globalAlpha=1;}
   ctx.textAlign="start";
-  uiT+=dt;if(uiT>.1){uiT=0;$("dist").textContent=Math.floor(S.dist);$("fill").style.width=Math.min(100,S.dist/GOAL*100)+"%";var sb=$("stam");sb.style.width=Math.max(0,Math.min(100,S.stam))+"%";sb.parentNode.parentNode.classList.toggle("low",tired);}
+  uiT+=dt;if(uiT>.1){uiT=0;$("dist").textContent=Math.floor(S.dist);$("fill").style.width=Math.min(100,S.dist/GOAL*100)+"%";var sb=$("stam");$("clock").textContent=G.fmt(S.clock||0);$("spd").textContent=(S.v||0).toFixed(1);$("boost").textContent="+"+Math.round((boostOf()-1)*100)+"%";sb.style.width=Math.max(0,Math.min(100,S.stam))+"%";sb.parentNode.parentNode.classList.toggle("low",tired);}
   requestAnimationFrame(frame);
 }
-function hold(btn,on){
-  btn.addEventListener("pointerdown",function(e){e.preventDefault();G.ac();on(true);btn.classList.add("hold");try{btn.setPointerCapture(e.pointerId)}catch(x){}});
+function hold(btn,on,tp){
+  btn.addEventListener("pointerdown",function(e){e.preventDefault();G.ac();on(true);tp();btn.classList.add("hold");try{btn.setPointerCapture(e.pointerId)}catch(x){}});
   ["pointerup","pointercancel","pointerleave"].forEach(function(ev){btn.addEventListener(ev,function(){on(false);btn.classList.remove("hold");});});
 }
-hold($("walk"),function(v){walkHeld=v});hold($("run"),function(v){runHeld=v});
+hold($("walk"),function(v){walkHeld=v},function(){tap(false)});hold($("run"),function(v){runHeld=v},function(){tap(true)});
 window.addEventListener("keydown",function(e){
   var t=e.target&&e.target.tagName;if(t==="INPUT"||t==="TEXTAREA")return;
-  if(e.key==="ArrowRight"||e.key==="d"||e.key==="D"){keyW=true;keyR=e.shiftKey;G.ac();e.preventDefault();}
-  if(e.key==="Shift")keyR=keyW;
-  var n=parseInt(e.key,10);if(n>=1&&n<=9&&G.fireKey)G.fireKey(n-1);
+  var k=e.key;
+  if(k==="ArrowRight"||k==="ArrowLeft"||k==="d"||k==="D"||k==="a"||k==="A"||k===" "){keyW=true;keyR=e.shiftKey;G.ac();if(!e.repeat)tap(e.shiftKey);e.preventDefault();}
+  if(k==="Shift")keyR=keyW;
+  var n=parseInt(k,10);if(n>=1&&n<=9&&G.fireKey)G.fireKey(n-1);
 });
 window.addEventListener("keyup",function(e){
-  if(e.key==="ArrowRight"||e.key==="d"||e.key==="D")keyW=false;
-  if(e.key==="Shift")keyR=false;
+  var k=e.key;
+  if(k==="ArrowRight"||k==="ArrowLeft"||k==="d"||k==="D"||k==="a"||k==="A"||k===" ")keyW=false;
+  if(k==="Shift")keyR=false;
 });
 window.addEventListener("blur",function(){keyW=false;keyR=false;});
 requestAnimationFrame(frame);
@@ -729,26 +791,35 @@ function clean(s,n){return String(s==null?"":s).replace(/[\u0000-\u001f\u007f\u2
 var tabs=document.querySelectorAll(".tabs > .tab[data-p]");
 tabs.forEach(function(t){t.addEventListener("click",function(){
   tabs.forEach(function(x){var on=x===t;x.setAttribute("aria-selected",on?"true":"false");$("p-"+x.dataset.p).hidden=!on;});
-  G.ac();
+  G.ac();if(t.dataset.p==="board")openBoard();
 });});
 
 /* ---------- tasks ---------- */
 var TASKS=[
- {n:"Walk 600 m to the rangoli chowk",par:70,r:120,kind:"walk",need:600,tip:"Hold Walk, or Run in short bursts."},
+ {n:"Walk 600 m to the rangoli chowk",par:80,r:120,kind:"walk",need:600,tip:"Tap Step fast to build speed."},
  {n:"Light 8 diyas at your doorstep",par:30,r:100,kind:"diya",need:8,tip:"Tap the lamps below."},
  {n:"Pray at all three shrines",par:80,r:150,kind:"pray",need:3,tip:"Ganesh, Laxmi and Saraswati, in the Mandir tab."},
  {n:"Burst 7 crackers",par:50,r:150,kind:"crack",need:7,tip:"Buy more in the Crackers tab if you run out."},
- {n:"Cover 1200 m towards the Mela gate",par:150,r:250,kind:"walk",need:1200,tip:"Manage your stamina: walk to recover."}
+ {n:"Cover 1200 m towards the Mela gate",par:160,r:250,kind:"walk",need:1200,tip:"Sprint taps give big bursts but use stamina."},
+ {n:"Sprint 400 m using Sprint taps",par:70,r:200,kind:"run",need:400,tip:"Only distance covered right after a Sprint tap counts."},
+ {n:"Buy 2 things in the Shop",par:45,r:150,kind:"buy",need:2,tip:"Crackers, lamps or clothes all count."},
+ {n:"Burst 4 different crackers",par:60,r:200,kind:"variety",need:4,tip:"Each kind counts once."},
+ {n:"Send a Diwali wish in a chat room",par:45,r:120,kind:"chat",need:1,tip:"Open Rooms, join one and say Happy Diwali."},
+ {n:"Light 12 diyas on the street",par:45,r:180,kind:"diya",need:12,tip:"Tap the lamps below."}
 ];
 function mult(e,par){var r=e/par;if(r<=.5)return 2;if(r>=2)return .25;return 2-(r-.5)*(1.75/1.5);}
 function bless(){return 1+.1*Object.keys(st().blessed).length;}
-function prog(t){var s=st(),b=s.base;
-  if(t.kind==="walk")return Math.min(t.need,Math.floor(s.walked-b.walked));
-  if(t.kind==="diya")return Math.min(t.need,s.diyas-b.diyas);
+function prog(t){var s=st(),b=s.base||{};
+  if(t.kind==="walk")return Math.min(t.need,Math.floor(s.walked-(b.walked||0)));
+  if(t.kind==="diya")return Math.min(t.need,s.diyas-(b.diyas||0));
   if(t.kind==="pray")return Math.min(t.need,(s.prays||0)-(b.prays||0));
-  return Math.min(t.need,s.bursts-b.bursts);}
+  if(t.kind==="run")return Math.min(t.need,Math.floor((s.ran||0)-(b.ran||0)));
+  if(t.kind==="buy")return Math.min(t.need,(s.buys||0)-(b.buys||0));
+  if(t.kind==="chat")return Math.min(t.need,(s.chats||0)-(b.chats||0));
+  if(t.kind==="variety")return Math.min(t.need,Object.keys(s.tk||{}).length);
+  return Math.min(t.need,s.bursts-(b.bursts||0));}
 function nowCoins(t){return Math.round((t.r||100)*mult(st().el||0,t.par)*bless());}
-function startTask(){var s=st();s.run=true;s.el=0;s.base={walked:s.walked,bursts:s.bursts,diyas:s.diyas,prays:s.prays||0};
+function startTask(){var s=st();s.run=true;s.el=0;s.base={walked:s.walked,bursts:s.bursts,diyas:s.diyas,prays:s.prays||0,ran:s.ran||0,buys:s.buys||0,chats:s.chats||0};s.tk={};
   renderTasks();G.toast("Task started. Go!");SFX.clink();G.save();}
 function finishTask(){
   var s=st(),t=TASKS[s.ti],m=mult(s.el,t.par),c=Math.round((t.r||100)*m*bless());
@@ -775,7 +846,7 @@ function renderTasks(){
     box.appendChild(row);
   });
   var done=s.ti>=TASKS.length;$("end").classList.toggle("on",done);
-  if(done){var tot=s.res.reduce(function(a,r){return a+r.c},0);$("endtxt").textContent="All five tasks done. You earned "+tot+" coins from tasks and now hold "+s.coins+". Head on to the Mela gate at 4 km, burst the rest of your crackers or shop for lamps and clothes.";}
+  if(done){var tot=s.res.reduce(function(a,r){return a+r.c},0);$("endtxt").textContent="All ten tasks done. You earned "+tot+" coins from tasks and now hold "+s.coins+". Keep sprinting to the Mela gate at 4 km, the run ends there.";}
   liveTask();
 }
 function liveTask(){
@@ -785,15 +856,14 @@ function liveTask(){
   var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
 $("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
-function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
+function freshState(){return {coins:50,dist:0,walked:0,v:0,clock:0,started:false,over:false,saved:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0,tk:{},ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0},res:[]};}
 var acc=0,saveAcc=0;
 G.update=function(dt){
   var s=st();acc+=dt;saveAcc+=dt;
   if(s.run){s.el=(s.el||0)+dt;var t=TASKS[s.ti];if(t&&prog(t)>=t.need){finishTask();}}
   if(acc>.25){acc=0;liveTask();}
   if(saveAcc>3){saveAcc=0;G.save();}
-  if(!s.gate4&&s.dist>=4000){s.gate4=true;s.coins+=150;coinsUI();G.toast("You reached the Diwali Mela gate! +150 coins");
-    [.2,.4,.6,.8].forEach(function(x,i){setTimeout(function(){G.FW.rocket(false,x)},i*300);});SFX.coin();G.save();}
+  if(!s.over&&s.dist>=4000)finishRun();
 };
 
 /* ---------- crackers ---------- */
@@ -820,7 +890,7 @@ function fire(id){
   var s=st();G.ac();
   var cr=CR.filter(function(c){return c.id===id})[0];
   if(!((s.inv[id]||0)>0)){G.toast("Out of "+(cr?cr.n:id)+". Buy more below.");return;}
-  s.inv[id]--;s.bursts++;
+  s.inv[id]--;s.bursts++;s.tk=s.tk||{};s.tk[id]=1;
   var xf=POS[id]?(.15+Math.random()*.7):null;
   G.FW[id](false,xf);G.greet();
   if(nr){try{nr.emit("burst",{k:id,x:xf,n:nick}).catch(function(){});}catch(e){}}
@@ -885,7 +955,7 @@ var LAMPS=[
  {id:"akhand",n:"Akhand jyot",p:550,col:"#f0c040",d:"Grand golden lamp with a tall flame"}
 ];
 var SHOP={
- clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,g:G.CLOTH[k].g,n:G.CLOTH[k].name,p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
+ clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,g:G.CLOTH[k].g,n:G.CLOTH[k].name,d:"Speed +"+Math.round((G.CLOTH[k].boost-1)*100)+"%",p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
  lamps:LAMPS,
  crackers:CR
 };
@@ -894,7 +964,7 @@ document.querySelectorAll("#shoptabs .tab").forEach(function(t){t.addEventListen
   cat=t.dataset.c;document.querySelectorAll("#shoptabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});renderShop();});});
 function buy(c,it){
   var s=st();if(s.coins<it.p){G.toast("Not enough coins yet. Finish a task!");return;}
-  s.coins-=it.p;
+  s.coins-=it.p;s.buys=(s.buys||0)+1;
   if(c==="clothes"){s.own.push(it.id);s.wear=it.id;}
   else if(c==="lamps")s.lamps[it.id]=(s.lamps[it.id]||0)+1;
   else s.inv[it.id]=(s.inv[it.id]||0)+1;
@@ -921,7 +991,7 @@ var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();renderCrackers()
 
 
 /* ---------- chat rooms ---------- */
-var ROOMS=[{id:"chowk",n:"Rangoli Chowk",b:"Meet and greet"},{id:"mithai",n:"Mithai Mandap",b:"Sweets and gossip"},{id:"ghat",n:"Aarti Ghat",b:"Evening prayers"}];
+var ROOMS=[{id:"chowk",n:"Rangoli Chowk",b:"Meet and greet"},{id:"mithai",n:"Mithai Mandap",b:"Sweets and gossip"},{id:"ghat",n:"Aarti Ghat",b:"Evening prayers"},{id:"maidan",n:"Cracker Maidan",b:"Show off your blasts"},{id:"bazaar",n:"Bazaar Gali",b:"Clothes, lamps and deals"}];
 var cur=null,unsubs=[],botT=0,lastSend=0,CRN=(function(){var o={};CR.forEach(function(c){o[c.id]=c.n;});return o;})();
 nick="Guest"+(100+Math.floor(Math.random()*900));
 function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return "hsl("+h+",70%,72%)";}
@@ -1043,7 +1113,7 @@ $("sendf").addEventListener("submit",function(e){
   var text=clean($("msg").value,140),nw=Date.now();
   if(!text||nw-lastSend<700)return;
   if(!cur){sys("Pick a room on the left first.");return;}
-  lastSend=nw;nick=clean($("nick").value,14)||nick;$("msg").value="";
+  lastSend=nw;nick=clean($("nick").value,14)||nick;$("msg").value="";st().chats=(st().chats||0)+1;
   if(nr){
     try{if(nr.connected&&!nr.connected()){sys("Reconnecting to the room, try again in a moment.");return;}
       nr.presence({n:nick});
@@ -1073,18 +1143,104 @@ function setGender(g){var s=st();s.gender=g;var def=g==="f"?"anarkali":"kurta";
   updateGender();renderShop();G.save();G.toast(g==="f"?"Playing as the girl":"Playing as the boy");}
 $("gm").addEventListener("click",function(){setGender("m")});
 $("gf").addEventListener("click",function(){setGender("f")});
+/* ---------- leaderboard and game over ---------- */
+var LBKEY="deepotsav-gali-lb-v1",CIDKEY="deepotsav-gali-cid",BESTKEY="deepotsav-gali-best",LBBASE="deepotsav-gali-darpan/v1/lb/";
+var gEntries={},gState="idle",gProm=null,gClient=null;
+function myCid(){try{var c=localStorage.getItem(CIDKEY);if(!c){c=Math.random().toString(36).slice(2,12);localStorage.setItem(CIDKEY,c);}return c;}catch(e){return window.__dgcid||(window.__dgcid=Math.random().toString(36).slice(2,12));}}
+function lbLocal(){try{var a=JSON.parse(localStorage.getItem(LBKEY)||"[]");return Array.isArray(a)?a.filter(function(x){return x&&typeof x.t==="number";}):[];}catch(e){return[];}}
+function lbPut(e){var a=lbLocal();a.push(e);a.sort(function(x,y){return x.t-y.t;});a=a.slice(0,10);try{localStorage.setItem(LBKEY,JSON.stringify(a));}catch(x){}return a;}
+function li(parent,n,t,c,me){var l=el("li",me?"me":null);l.appendChild(el("span","nm",(clean(n,14)||"Guest")+(c!=null?" · "+c+" coins":"")));l.appendChild(el("span","t",G.fmt(t)));parent.appendChild(l);}
+function renderBoard(){
+  var g=$("glist"),l=$("llist");if(!g||!l)return;g.textContent="";l.textContent="";
+  var me=LBBASE+myCid(),arr=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:k===me};}).sort(function(a,b){return a.t-b.t;}).slice(0,20);
+  arr.forEach(function(e){li(g,e.n,e.t,e.c,e.me);});
+  var loc=lbLocal();loc.forEach(function(e){li(l,e.n,e.t,e.c,false);});
+  if(!loc.length)l.appendChild(el("li","muted","No finished runs yet."));
+  var gs=$("gstat");
+  gs.textContent=gState==="live"?(arr.length?"Shared leaderboard: "+arr.length+" run"+(arr.length===1?"":"s")+".":"Connected. No runs posted yet. Be the first!"):gState==="connecting"?"Connecting to the shared leaderboard…":gState==="offline"?"Could not reach the shared leaderboard. Your own runs are still saved on this device.":"Open this tab to load the shared leaderboard.";
+}
+async function gConnectInner(){
+  gState="connecting";renderBoard();
+  var m,client=null;
+  try{m=await loadMqtt();}catch(e){gState="offline";renderBoard();return null;}
+  for(var i=0;i<BROKERS.length&&!client;i++){try{client=await connectBroker(m,BROKERS[i]);}catch(e){client=null;}}
+  if(!client){gState="offline";renderBoard();return null;}
+  gClient=client;gState="live";
+  client.on("message",function(topic,payload){
+    if(topic.indexOf(LBBASE)!==0)return;
+    var d;try{d=JSON.parse(payload.toString());}catch(e){return;}
+    if(!d||typeof d.n!=="string"||typeof d.t!=="number"||!isFinite(d.t)||d.t<100||d.t>20000)return;
+    var c=(typeof d.c==="number"&&isFinite(d.c)&&d.c>=0&&d.c<=999999)?Math.round(d.c):0;
+    gEntries[topic]={n:clean(d.n,14),t:Math.round(d.t*10)/10,c:c};renderBoard();
+  });
+  client.subscribe(LBBASE+"+");renderBoard();return client;
+}
+function gConnect(){if(!gProm){gProm=gConnectInner().then(function(c){if(!c)gProm=null;return c;});}return gProm;}
+function openBoard(){renderBoard();gConnect();}
+async function postGlobal(name,t,coins){
+  var best=Infinity;try{best=parseFloat(localStorage.getItem(BESTKEY))||Infinity;}catch(e){}
+  var useT=Math.min(best,t);try{localStorage.setItem(BESTKEY,String(useT));}catch(e){}
+  var cl=await gConnect();if(!cl)return false;
+  try{cl.publish(LBBASE+myCid(),JSON.stringify({n:clean(name,14)||"Guest",t:Math.round(useT*10)/10,c:Math.round(coins),v:1}),{retain:true,qos:1});}catch(e){return false;}
+  return true;
+}
+function fillOver(){
+  var ol=$("overlist");ol.textContent="";var loc=lbLocal().slice(0,5),s=st();
+  loc.forEach(function(e){li(ol,e.n,e.t,e.c,s.saved&&Math.abs(e.t-Math.round((s.finish||0)*10)/10)<.06);});
+  if(!loc.length)ol.appendChild(el("li","muted","Save your time to start the list."));
+}
+function showOver(){
+  var s=st();if(!s.over)return;
+  $("overtime").textContent=G.fmt(s.finish||s.clock||0);
+  var c=G.CLOTH[s.wear]||{name:"Cotton kurta"};
+  $("overinfo").textContent="Outfit: "+c.name+" · "+s.coins+" coins left · "+s.ti+" of "+TASKS.length+" tasks done · "+s.bursts+" crackers burst";
+  $("lbname").value=clean($("nick").value,14)||nick;
+  $("lbmsg").textContent=s.saved?"Saved to the leaderboard.":"";
+  $("lbsave").disabled=!!s.saved;
+  fillOver();$("over").hidden=false;
+}
+function finishRun(){
+  var s=st();s.over=true;s.dist=4000;s.v=0;s.finish=s.clock||0;
+  G.toast("You reached the Mela gate!");SFX.coin();
+  [.15,.3,.5,.7,.85].forEach(function(x,i){setTimeout(function(){G.FW.rocket(false,x);G.greet();},i*260);});
+  setTimeout(function(){G.FW.maha(false,.5);},900);
+  G.save();setTimeout(showOver,1900);
+}
+$("lbform").addEventListener("submit",async function(e){
+  e.preventDefault();
+  var s=st();if(!s.over||s.saved)return;
+  var name=clean($("lbname").value,14)||"Guest";nick=name;$("nick").value=name;
+  var t=s.finish||s.clock||0;lbPut({n:name,t:Math.round(t*10)/10,c:s.coins,d:Date.now()});s.saved=true;G.save();
+  $("lbsave").disabled=true;$("lbmsg").textContent="Saved on this device. Posting to the shared board…";fillOver();
+  var ok=await postGlobal(name,t,s.coins);
+  $("lbmsg").textContent=ok?"Posted to the shared leaderboard. Open the Leaderboard tab to see everyone.":"Saved on this device. The shared leaderboard could not be reached.";
+  renderBoard();
+});
+function resetGame(){
+  $("over").hidden=true;
+  G.setS(Object.assign({},freshState()));coinsUI();renderAll();
+  G.toast("New run! Tap Step to start the clock.");
+}
+$("runagain").addEventListener("click",resetGame);
+var rsT=0;
+$("restart").addEventListener("click",function(){
+  var b=this;
+  if(b.dataset.arm==="1"){b.dataset.arm="0";b.textContent="Restart run";clearTimeout(rsT);resetGame();return;}
+  b.dataset.arm="1";b.textContent="Click again to restart";rsT=setTimeout(function(){b.dataset.arm="0";b.textContent="Restart run";},3000);
+});
 /* ---------- keep older saves working ---------- */
 function ensureKeys(){
   var s=st();s.inv=s.inv||{};s.lamps=s.lamps||{};s.own=s.own||["kurta"];
   CR.forEach(function(c){if(typeof s.inv[c.id]!=="number")s.inv[c.id]=0;});
   LAMPS.forEach(function(l){if(typeof s.lamps[l.id]!=="number")s.lamps[l.id]=0;});
   if(!s.gender)s.gender="m";if(typeof s.stam!=="number")s.stam=100;
+  ["v","clock","ran","buys","chats"].forEach(function(k){if(typeof s[k]!=="number")s[k]=0;});s.tk=s.tk||{};s.base=s.base||{};
 }
 /* ---------- boot ---------- */
 function renderAll(){ensureKeys();updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
 $("nick").value=nick;
 coinsUI();renderAll();
-G.toast("Press Start on task 1, then hold Walk ▶");
+if(st().over)showOver();else G.toast("Tap Step fast to run! The clock starts on your first step.");
 })();
 </script>
 
