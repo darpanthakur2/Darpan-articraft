@@ -63,7 +63,7 @@ a.btn{display:inline-flex;align-items:center;text-decoration:none;touch-action:a
 .lb li.me{color:var(--marigold)}
 .over[hidden]{display:none}
 .over{position:fixed;inset:0;z-index:50;background:rgba(8,3,16,.84);display:flex;align-items:center;justify-content:center;padding:16px}
-.overbox{background:var(--panel);border:1px solid var(--marigold);border-radius:16px;padding:20px;width:min(480px,100%);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:12px;text-align:center}
+.overbox{background:var(--panel);border:1px solid var(--marigold);border-radius:16px;padding:20px;width:min(640px,100%);max-height:92vh;overflow:auto;display:flex;flex-direction:column;gap:12px;text-align:center}
 .big{font-family:var(--display);font-size:46px;line-height:1.1;color:var(--marigold);font-variant-numeric:tabular-nums}
 .mk{position:absolute;top:-3px;width:2px;height:18px;background:var(--line)}
 .marks{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:3px;font-variant-numeric:tabular-nums}
@@ -255,13 +255,20 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     <h2 id="overh">Shubh Deepawali! You reached the Mela gate</h2>
     <div class="big" id="overtime">0:00.0</div>
     <p class="muted" id="overinfo"></p>
+    <p class="muted" id="lbmsg">Saving your time…</p>
+    <p id="lbrank" style="font-weight:700;color:var(--marigold);margin:0"></p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;text-align:left">
+      <div><h3 style="margin:0 0 6px">Everyone</h3><ol class="lb" id="overglobal"></ol></div>
+      <div><h3 style="margin:0 0 6px">This device</h3><ol class="lb" id="overlist"></ol></div>
+    </div>
     <form class="send" id="lbform" style="margin:0">
       <input type="text" id="lbname" maxlength="14" placeholder="Your name" aria-label="Name for the leaderboard">
-      <button class="btn pri" id="lbsave" type="submit">Save time</button>
+      <button class="btn" id="lbsave" type="submit">Update name</button>
     </form>
-    <p class="muted" id="lbmsg"></p>
-    <ol class="lb" id="overlist"></ol>
-    <button class="btn pri" id="runagain" type="button">Run again from 0</button>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+      <button class="btn" id="seeboard" type="button">Open leaderboard tab</button>
+      <button class="btn pri" id="runagain" type="button">Run again from 0</button>
+    </div>
   </div>
 </div>
 <script>
@@ -1243,14 +1250,15 @@ var LBKEY="deepotsav-gali-lb-v1",CIDKEY="deepotsav-gali-cid",BESTKEY="deepotsav-
 var gEntries={},gState="idle",gProm=null,gClient=null;
 function myCid(){try{var c=localStorage.getItem(CIDKEY);if(!c){c=Math.random().toString(36).slice(2,12);localStorage.setItem(CIDKEY,c);}return c;}catch(e){return window.__dgcid||(window.__dgcid=Math.random().toString(36).slice(2,12));}}
 function lbLocal(){try{var a=JSON.parse(localStorage.getItem(LBKEY)||"[]");return Array.isArray(a)?a.filter(function(x){return x&&typeof x.t==="number";}):[];}catch(e){return[];}}
-function lbPut(e){var a=lbLocal();a.push(e);a.sort(function(x,y){return x.t-y.t;});a=a.slice(0,10);try{localStorage.setItem(LBKEY,JSON.stringify(a));}catch(x){}return a;}
+function lbPut(e){var a=lbLocal().filter(function(x){return !e.d||x.d!==e.d;});a.push(e);a.sort(function(x,y){return x.t-y.t;});a=a.slice(0,10);try{localStorage.setItem(LBKEY,JSON.stringify(a));}catch(x){}return a;}
 function li(parent,n,t,c,me){var l=el("li",me?"me":null);l.appendChild(el("span","nm",(clean(n,14)||"Guest")+(c!=null?" · "+c+" coins":"")));l.appendChild(el("span","t",G.fmt(t)));parent.appendChild(l);}
 function renderBoard(){
   var g=$("glist"),l=$("llist");if(!g||!l)return;g.textContent="";l.textContent="";
   var me=LBBASE+myCid(),arr=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:k===me};}).sort(function(a,b){return a.t-b.t;}).slice(0,20);
   arr.forEach(function(e){li(g,e.n,e.t,e.c,e.me);});
-  var loc=lbLocal();loc.forEach(function(e){li(l,e.n,e.t,e.c,false);});
+  var loc=lbLocal(),ed=st().entryD;loc.forEach(function(e){li(l,e.n,e.t,e.c,!!ed&&e.d===ed);});
   if(!loc.length)l.appendChild(el("li","muted","No finished runs yet."));
+  if($("over")&&!$("over").hidden)fillOver();
   var gs=$("gstat");
   gs.textContent=gState==="live"?(arr.length?"Shared leaderboard: "+arr.length+" run"+(arr.length===1?"":"s")+".":"Connected. No runs posted yet. Be the first!"):gState==="connecting"?"Connecting to the shared leaderboard…":gState==="offline"?"Could not reach the shared leaderboard. Your own runs are still saved on this device.":"Open this tab to load the shared leaderboard.";
 }
@@ -1280,9 +1288,17 @@ async function postGlobal(name,t,coins){
   return true;
 }
 function fillOver(){
-  var ol=$("overlist");ol.textContent="";var loc=lbLocal().slice(0,5),s=st();
-  loc.forEach(function(e){li(ol,e.n,e.t,e.c,s.saved&&Math.abs(e.t-Math.round((s.finish||0)*10)/10)<.06);});
-  if(!loc.length)ol.appendChild(el("li","muted","Save your time to start the list."));
+  var s=st(),ol=$("overlist"),og=$("overglobal");ol.textContent="";og.textContent="";
+  var loc=lbLocal(),ed=s.entryD;
+  loc.slice(0,5).forEach(function(e){li(ol,e.n,e.t,e.c,!!ed&&e.d===ed);});
+  if(!loc.length)ol.appendChild(el("li","muted","No runs saved yet."));
+  var me=LBBASE+myCid(),all=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:k===me};}).sort(function(a,b){return a.t-b.t;});
+  all.slice(0,10).forEach(function(e){li(og,e.n,e.t,e.c,e.me);});
+  if(!all.length)og.appendChild(el("li","muted",gState==="offline"?"Shared leaderboard not reachable.":"Loading the shared leaderboard…"));
+  var rk="",gi=-1;all.forEach(function(e,i){if(e.me)gi=i;});
+  if(gi>=0)rk="You are #"+(gi+1)+" of "+all.length+" on the shared leaderboard";
+  else{var li2=-1;loc.forEach(function(e,i){if(ed&&e.d===ed)li2=i;});if(li2>=0)rk="You are #"+(li2+1)+" on this device";}
+  $("lbrank").textContent=rk;
 }
 function showOver(){
   var s=st();if(!s.over)return;
@@ -1290,27 +1306,32 @@ function showOver(){
   var c=G.CLOTH[s.wear]||{name:"Plain clothes"};
   $("overinfo").textContent="Outfit: "+c.name+" · "+s.coins+" coins left · "+s.ti+" of "+TASKS.length+" tasks done · "+s.bursts+" crackers burst";
   $("lbname").value=clean($("nick").value,14)||nick;
-  $("lbmsg").textContent=s.saved?"Saved to the leaderboard.":"";
-  $("lbsave").disabled=!!s.saved;
   fillOver();$("over").hidden=false;
 }
+/* the finish time is saved and posted automatically; the name box only changes the name */
+async function postRun(name){
+  var s=st(),t=s.finish||s.clock||0;nick=name;$("nick").value=name;
+  if(!s.entryD)s.entryD=Date.now();
+  lbPut({n:name,t:Math.round(t*10)/10,c:s.coins,d:s.entryD});s.saved=true;G.save();
+  $("lbmsg").textContent="Time saved on this device. Posting to the shared leaderboard…";renderBoard();fillOver();
+  var ok=await postGlobal(name,t,s.coins);
+  $("lbmsg").textContent=ok?"Posted to the shared leaderboard automatically.":"Saved on this device. The shared leaderboard could not be reached.";
+  renderBoard();fillOver();
+}
+function autoSave(){var s=st();if(!s.over||s.saved)return;postRun(clean($("nick").value,14)||nick||"Guest");}
 function finishRun(){
   var s=st();s.over=true;s.dist=4000;s.v=0;s.finish=s.clock||0;
   G.toast("You reached the Mela gate!");SFX.coin();
   [.15,.3,.5,.7,.85].forEach(function(x,i){setTimeout(function(){G.FW.rocket(false,x);G.greet();},i*260);});
   setTimeout(function(){G.FW.maha(false,.5);},900);
-  G.save();setTimeout(showOver,1900);
+  G.save();autoSave();setTimeout(showOver,1900);
 }
-$("lbform").addEventListener("submit",async function(e){
+$("lbform").addEventListener("submit",function(e){
   e.preventDefault();
-  var s=st();if(!s.over||s.saved)return;
-  var name=clean($("lbname").value,14)||"Guest";nick=name;$("nick").value=name;
-  var t=s.finish||s.clock||0;lbPut({n:name,t:Math.round(t*10)/10,c:s.coins,d:Date.now()});s.saved=true;G.save();
-  $("lbsave").disabled=true;$("lbmsg").textContent="Saved on this device. Posting to the shared board…";fillOver();
-  var ok=await postGlobal(name,t,s.coins);
-  $("lbmsg").textContent=ok?"Posted to the shared leaderboard. Open the Leaderboard tab to see everyone.":"Saved on this device. The shared leaderboard could not be reached.";
-  renderBoard();
+  var s=st();if(!s.over)return;
+  postRun(clean($("lbname").value,14)||"Guest");
 });
+$("seeboard").addEventListener("click",function(){$("over").hidden=true;$("t-board").click();});
 function resetGame(){
   $("over").hidden=true;
   G.setS(Object.assign({},freshState()));coinsUI();renderAll();
@@ -1336,7 +1357,7 @@ function ensureKeys(){
 function renderAll(){ensureKeys();updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderMyLamps();renderWardrobe();renderSongs();renderRooms();$("nick").value=nick;}
 $("nick").value=nick;
 coinsUI();renderAll();
-if(st().over)showOver();else G.toast("Tap Step fast to run! The clock starts on your first step.");
+if(st().over){autoSave();showOver();}else G.toast("Tap Step fast to run! The clock starts on your first step.");
 })();
 </script>
 
