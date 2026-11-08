@@ -582,7 +582,7 @@ var G=window.__G,$=G.$,SFX=G.SFX;
 function st(){return G.S}
 function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
 function coinsUI(){$("coins").textContent=st().coins;}
-function clean(s,n){return String(s==null?"":s).replace(/[\u0000-\u001f\u007f​-‏‪-‮⁠-⁯﻿]/g,"").trim().slice(0,n);}
+function clean(s,n){return String(s==null?"":s).replace(/[\u0000-\u001f\u007f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/g,"").trim().slice(0,n);}
 
 /* ---------- tabs ---------- */
 var tabs=document.querySelectorAll(".tabs > .tab[data-p]");
