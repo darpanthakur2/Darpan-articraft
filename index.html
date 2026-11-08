@@ -147,6 +147,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   <div class="walkbar">
     <button class="btn pri" id="walk" type="button">Step ▶</button>
     <button class="btn" id="run" type="button">Sprint ⏩</button>
+    <button class="btn" id="lightd" type="button" title="Light a diya right here, any time (key: L)">🪔 Light diya (L)</button>
     <span class="tgl" role="group" aria-label="Choose character">Character
       <button class="btn" id="gm" type="button" aria-pressed="true">Boy</button>
       <button class="btn" id="gf" type="button" aria-pressed="false">Girl</button>
@@ -637,6 +638,9 @@ function drawRoad(wp){
   for(var k=k0;k<k0+3;k++){var sx=k*480+300-wp+AX;if(sx<-90||sx>W+90||k<0)continue;rangoli(sx,404,k);}
   var d0=Math.floor((wp-AX)/56);
   for(var d=d0;d<d0+16;d++){var x=d*56-wp+AX+10;glow(x,424,20,"rgba(255,170,50,.95)",.35);diya(x,426,1.1,"clay");}
+  var lit=G.S.lit||[];
+  for(var li=0;li<lit.length;li++){var lx=lit[li].x-wp+AX;if(lx<-40||lx>W+40)continue;
+    var ly=lit[li].y;glow(lx,ly-6,34,"rgba(255,190,70,.95)",.5+.1*Math.sin(tt*6+li));diya(lx,ly,1.5,"clay");}
   for(var m=1;m<=8;m++){
     var sx2=m*500*PXM-wp+AX+40;if(sx2<-60||sx2>W+60)continue;
     ctx.fillStyle="#5a3a2a";ctx.fillRect(sx2,300,4,52);ctx.fillStyle="#ffcf4a";ctx.fillRect(sx2-26,290,56,22);
@@ -762,9 +766,18 @@ function hold(btn,on,tp){
   ["pointerup","pointercancel","pointerleave"].forEach(function(ev){btn.addEventListener(ev,function(){on(false);btn.classList.remove("hold");});});
 }
 hold($("walk"),function(v){walkHeld=v},function(){tap(false)});hold($("run"),function(v){runHeld=v},function(){tap(true)});
+function lightDiya(){
+  var S=G.S;if(!S.lit)S.lit=[];
+  var wp=S.dist*PXM;
+  S.lit.push({x:wp+25+Math.random()*60,y:398+Math.random()*34});
+  if(S.lit.length>400)S.lit.shift();
+  G.ac();G.SFX.clink();G.toast("Diya lit! 🪔 ("+S.lit.length+" glowing on the street)");G.save();
+}
+$("lightd").addEventListener("click",lightDiya);
 window.addEventListener("keydown",function(e){
   var t=e.target&&e.target.tagName;if(t==="INPUT"||t==="TEXTAREA")return;
   var k=e.key;
+  if((k==="l"||k==="L")&&!e.repeat&&!e.ctrlKey&&!e.metaKey){lightDiya();}
   if(k==="ArrowRight"||k==="ArrowLeft"||k==="d"||k==="D"||k==="a"||k==="A"||k===" "){keyW=true;keyR=e.shiftKey;G.ac();if(!e.repeat)tap(e.shiftKey);e.preventDefault();}
   if(k==="Shift")keyR=keyW;
   var n=parseInt(k,10);if(n>=1&&n<=9&&G.fireKey)G.fireKey(n-1);
@@ -856,7 +869,7 @@ function liveTask(){
   var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
 $("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
-function freshState(){return {coins:50,dist:0,walked:0,v:0,clock:0,started:false,over:false,saved:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0,tk:{},ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0},res:[]};}
+function freshState(){return {lit:[],coins:50,dist:0,walked:0,v:0,clock:0,started:false,over:false,saved:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0,tk:{},ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0},res:[]};}
 var acc=0,saveAcc=0;
 G.update=function(dt){
   var s=st();acc+=dt;saveAcc+=dt;
