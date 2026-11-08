@@ -799,6 +799,58 @@ function onBurst(msg){
 }
 function onPeers(ch){var r=ROOMS.filter(function(x){return x.id===cur})[0];
   $("chatstat").textContent="Live in "+(r?r.n:"room")+" · "+ch.peers.length+" here now";}
+/* ---------- live rooms for visitors outside Claude (public MQTT relay) ---------- */
+var BROKERS=["wss://broker.hivemq.com:8884/mqtt","wss://broker.emqx.io:8084/mqtt"];
+function loadMqtt(){
+  return new Promise(function(res,rej){
+    if(window.mqtt)return res(window.mqtt);
+    var s=document.createElement("script");s.src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js";
+    var done=false,to=setTimeout(function(){if(!done){done=true;rej(new Error("timeout"));}},12000);
+    s.onload=function(){if(done)return;done=true;clearTimeout(to);window.mqtt?res(window.mqtt):rej(new Error("missing"));};
+    s.onerror=function(){if(done)return;done=true;clearTimeout(to);rej(new Error("load"));};
+    document.head.appendChild(s);
+  });
+}
+function connectBroker(m,url){
+  return new Promise(function(res,rej){
+    var c,done=false,to=setTimeout(function(){if(!done){done=true;try{c.end(true)}catch(e){}rej(new Error("timeout"));}},9000);
+    try{c=m.connect(url,{clean:true,connectTimeout:8000,reconnectPeriod:4000,clientId:"dg-"+Math.random().toString(36).slice(2,12)});}catch(e){clearTimeout(to);return rej(e);}
+    c.on("connect",function(){if(done)return;done=true;clearTimeout(to);res(c);});
+    c.on("error",function(){});
+  });
+}
+async function joinMqtt(r){
+  var m,client=null;
+  try{m=await loadMqtt();}catch(e){return null;}
+  for(var i=0;i<BROKERS.length&&!client;i++){try{client=await connectBroker(m,BROKERS[i]);}catch(e){client=null;}}
+  if(!client)return null;
+  var base="deepotsav-gali-darpan/v1/"+r.id+"/",cid=Math.random().toString(36).slice(2,10),peers={},hb=0;
+  function beat(){try{client.publish(base+"hb",JSON.stringify({c:cid}));}catch(e){}}
+  function count(){var now=Date.now(),n=1;for(var k in peers){if(now-peers[k]<45000)n++;else delete peers[k];}return n;}
+  function stat(){onPeers({peers:{length:count()}});}
+  client.on("message",function(topic,payload){
+    var d;try{d=JSON.parse(payload.toString());}catch(e){return;}
+    if(!d||typeof d.c!=="string"||d.c===cid||topic.indexOf(base)!==0)return;
+    var t=topic.slice(base.length);
+    if(t==="chat")onChat({isMe:false,data:d});
+    else if(t==="burst")onBurst({isMe:false,data:d});
+    else if(t==="hb"){var fresh=!peers[d.c];peers[d.c]=Date.now();if(fresh)beat();stat();}
+  });
+  client.subscribe(base+"+");
+  beat();hb=setInterval(function(){beat();stat();},15000);stat();
+  return {
+    emit:function(topic,data){
+      if(topic!=="chat"&&topic!=="burst")return Promise.resolve();
+      var d=Object.assign({c:cid},data);
+      try{client.publish(base+topic,JSON.stringify(d));}catch(e){return Promise.reject(e);}
+      if(topic==="chat")onChat({isMe:true,data:d});
+      return Promise.resolve();
+    },
+    connected:function(){return !!client.connected;},
+    presence:function(){return Promise.resolve();},
+    leave:function(){clearInterval(hb);try{client.end(true);}catch(e){}return Promise.resolve();}
+  };
+}
 async function joinRoom(r){
   leaveRoom();cur=r.id;renderRooms();$("log").textContent="";G.ac();
   $("chatstat").textContent="Joining "+r.n+"…";
@@ -816,10 +868,13 @@ async function joinRoom(r){
       return;
     }catch(e){}
   }
+  var live=await joinMqtt(r);
+  if(cur!==r.id){if(live)live.leave();return;}
+  if(live){nr=live;sys("You are live in "+r.n+" on a public festival server. Friends in this room see your messages and rockets. Do not share personal details.");return;}
   solo(r);
 }
 function solo(r){
-  $("chatstat").textContent="Solo mode in "+r.n+". Live rooms need you signed in to Claude with this page open there. Festival neighbours (bots) keep you company.";
+  $("chatstat").textContent="Could not reach the live chat server, so you are in "+r.n+" with the festival bots for now.";
   sys("Joined "+r.n+" (bots only).");
   var lines=[["Meera (bot)","Shubh Deepawali everyone! The street looks stunning."],["Arjun (bot)","Just lit a laxmi bomb, the whole gali shook."],["Kavya (bot)","The rangoli near the chowk is my favourite so far."],["Meera (bot)","Don't forget the Laxmi pooja before the crackers."],["Arjun (bot)","Anyone racing to the Mela gate? I'm running."],["Kavya (bot)","Saving coins for a lehenga, wish me luck!"],["Arjun (bot)","Happy Diwali! Have some mithai."]];
   var i=0;botT=setInterval(function(){var l=lines[i++%lines.length];addMsg(l[0],l[1]);},6500);
