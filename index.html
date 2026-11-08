@@ -52,6 +52,11 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:20/11}
 .prog{flex:1 1 220px;min-width:180px}
 .track{position:relative;height:12px;border-radius:99px;background:var(--night2);border:1px solid var(--line)}
 .fill{position:absolute;inset:0 auto 0 0;width:0;border-radius:99px;background:linear-gradient(90deg,var(--saffron),var(--marigold))}
+.stam{flex:0 1 150px;min-width:120px;display:flex;flex-direction:column;gap:3px;color:var(--muted);font-size:12px}
+.stam.low span{color:var(--warn);font-weight:700}
+.sfill{width:100%;background:linear-gradient(90deg,var(--peacock),#7dff6a)}
+.stam.low .sfill{background:linear-gradient(90deg,var(--warn),var(--rose))}
+a.btn{display:inline-flex;align-items:center;text-decoration:none;touch-action:auto}
 .mk{position:absolute;top:-3px;width:2px;height:18px;background:var(--line)}
 .marks{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-top:3px;font-variant-numeric:tabular-nums}
 .tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:thin}
@@ -118,7 +123,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     </div>
     <div class="chips" aria-live="polite">
       <span class="chip">🪙 <b id="coins">0</b></span>
-      <span class="chip">🚶 <b id="dist">0</b> m / 2000</span>
+      <span class="chip">🚶 <b id="dist">0</b> m / 4000</span>
       <span class="chip">⏱ <b id="timer">--</b></span>
     </div>
   </header>
@@ -131,16 +136,16 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   <div class="walkbar">
     <button class="btn pri" id="walk" type="button">Walk ▶</button>
     <button class="btn" id="run" type="button">Run ⏩</button>
-    <label class="tgl"><input type="checkbox" id="auto"> Keep walking</label>
     <span class="tgl" role="group" aria-label="Choose character">Character
       <button class="btn" id="gm" type="button" aria-pressed="true">Boy</button>
       <button class="btn" id="gf" type="button" aria-pressed="false">Girl</button>
     </span>
+    <div class="stam" title="Running uses up stamina. Walking and resting refill it."><span>⚡ Stamina</span><div class="track"><div class="fill sfill" id="stam" style="width:100%"></div></div></div>
     <div class="prog">
       <div class="track"><div class="fill" id="fill"></div>
-        <i class="mk" style="left:20%"></i><i class="mk" style="left:40%"></i><i class="mk" style="left:60%"></i><i class="mk" style="left:80%"></i>
+        <i class="mk" style="left:25%"></i><i class="mk" style="left:50%"></i><i class="mk" style="left:75%"></i>
       </div>
-      <div class="marks"><span>Start</span><span>500 m</span><span>1 km</span><span>1.5 km</span><span>Mela gate 2 km</span></div>
+      <div class="marks"><span>Start</span><span>1 km</span><span>2 km</span><span>3 km</span><span>Mela gate 4 km</span></div>
     </div>
   </div>
 
@@ -156,14 +161,14 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   <section class="panel" id="p-tasks" role="tabpanel" aria-labelledby="t-tasks">
     <div>
       <h2>Five festival tasks</h2>
-      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each.</p>
+      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each. The street to the Mela gate is 4 km: running drains stamina, so mix walking and running.</p>
     </div>
     <div id="tasklist" style="display:flex;flex-direction:column;gap:8px"></div>
     <div class="end" id="end"><h2>Shubh Deepawali!</h2><p id="endtxt" class="muted"></p><p style="margin-top:10px"><button class="btn pri" id="again" type="button">Play again</button></p></div>
   </section>
 
   <section class="panel" id="p-crackers" role="tabpanel" aria-labelledby="t-crackers" hidden>
-    <div><h2>Crackers</h2><p class="muted">Keys 1 to 5 burst them too. Buy more in the Shop. Rooms friends see your rockets in their sky.</p></div>
+    <div><h2>Crackers</h2><p class="muted">Fifteen crackers, and each one costs more than the one before. Keys 1 to 9 burst the first nine. Every blast says Happy Diwali to all.</p></div>
     <div class="grid" id="crgrid"></div>
   </section>
 
@@ -198,8 +203,16 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   </section>
 
   <section class="panel" id="p-songs" role="tabpanel" aria-labelledby="t-songs" hidden>
-    <div><h2>Diwali tunes</h2><p class="muted">Instrumental festival music made inside the page, in ragas used for evening aarti. Tap a tune to play it while you walk.</p></div>
+    <div><h2>Diwali tunes</h2><p class="muted">Instrumental festival tunes made inside the page, including original dhuns for Ganesh, Laxmi and Saraswati. Tap one to play it while you walk.</p></div>
     <div class="songs" id="songs"></div>
+    <div class="card"><b>Bollywood devotional songs</b>
+      <span class="muted">Film songs are copyrighted, so they cannot be built into this page. These buttons open YouTube searches in a new tab, so you can play the real songs while you walk.</span>
+      <div class="walkbar">
+        <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/results?search_query=Ganpati+Bollywood+songs">Ganesh songs</a>
+        <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/results?search_query=Laxmi+Mata+Bollywood+aarti+songs">Laxmi songs</a>
+        <a class="btn" target="_blank" rel="noopener noreferrer" href="https://www.youtube.com/results?search_query=Saraswati+Bollywood+songs">Saraswati songs</a>
+      </div>
+    </div>
     <div class="walkbar"><label class="tgl">Volume <input type="range" id="vol" min="0" max="100" value="60" aria-label="Music volume"></label></div>
   </section>
 </div>
@@ -207,7 +220,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
 (function(){
 "use strict";
 var $=function(id){return document.getElementById(id)};
-var PXM=12, GOAL=2000, W=800, H=440, GY=372, AX=250;
+var PXM=12, GOAL=4000, W=800, H=440, GY=372, AX=250;
 
 /* ---------- state ---------- */
 function fresh(){return {coins:50,dist:0,walked:0,gateDone:false,
@@ -271,6 +284,13 @@ var SONGS=[
   mel:[[0,.5],[2,.5],[4,.5],[2,.5],[5,.5],[4,.5],[2,.5],[0,.5],[1,.5],[3,.5],[5,.5],[3,.5],[6,.5],[5,.5],[4,.5],[2,.5],[4,.5],[5,.5],[6,.5],[7,.5],[8,1],[6,.5],[4,.5],[2,1],[0,1]],tab:[1,.3,.5,.3,.8,.3,.5,.5]},
  {id:"laxmi",name:"Laxmi Pooja Taal",desc:"Steady dholak groove for the pooja hour",bpm:96,root:196,scale:[0,2,4,5,7,9,10],
   mel:[[2,1],[4,.5],[5,.5],[4,1],[2,1],[0,1],[2,.5],[4,.5],[5,1],[7,1],[5,1],[4,2],[5,.5],[4,.5],[2,1],[0,1],[2,1],[0,2]],tab:[1,0,.4,0,.7,0,.4,.4]}
+,
+ {id:"ganesh",name:"Ganesh Vandana Dhun",desc:"Original instrumental in a bright, steady taal",bpm:88,root:196,scale:[0,2,4,5,7,9,11],
+  mel:[[0,1],[2,1],[4,1.5],[2,.5],[3,1],[2,1],[0,2],[2,1],[4,1],[5,1.5],[4,.5],[2,1],[3,1],[2,2],[4,1],[7,1.5],[5,.5],[4,1],[2,1],[0,2]],tab:[1,0,.4,0,.7,0,.4,.4]},
+ {id:"laxmiaarti",name:"Laxmi Aarti Dhun",desc:"Original instrumental in a Yaman-style raga",bpm:76,root:196,scale:[0,2,4,6,7,9,11],
+  mel:[[2,1],[4,.5],[5,.5],[6,1],[4,1],[2,1.5],[4,.5],[5,1],[3,1],[2,1],[4,2],[6,1],[8,1],[7,.5],[6,.5],[5,1],[4,1],[2,2]],tab:[1,0,0,0,.5,0,.5,0]},
+ {id:"saraswati",name:"Saraswati Vandana Dhun",desc:"Original soft instrumental in a Bhupali-style raga",bpm:66,root:220,scale:[0,2,4,7,9,12,14],
+  mel:[[4,1],[3,1],[2,1.5],[1,.5],[2,1],[0,1],[1,1],[2,2],[4,1],[5,1.5],[4,.5],[3,1],[2,1],[1,1],[0,2]],tab:[.8,0,0,0,.3,0,0,0]}
 ];
 var mus={on:null,timer:0,nextN:0,mi:0,nextB:0,bc:0,drone:[],vol:.6};
 function pluck(t,f,dur){
@@ -325,10 +345,36 @@ var COLS=["#ffcf4a","#ff6a3d","#ff3d81","#8f5bff","#2fd7c4","#7dff6a","#4aa8ff",
 function pick(a){return a[Math.floor(Math.random()*a.length)];}
 function spawn(x,y,vx,vy,life,col,size,g,drag){P.push({x:x,y:y,vx:vx,vy:vy,l:life,m:life,c:col,s:size||2,g:g==null?60:g,d:drag==null?.985:drag});}
 function burst(x,y,col,kind){
-  var n=kind==="ring"?46:kind==="willow"?60:70,sp=kind==="willow"?110:150,c2=pick(COLS);
-  for(var i=0;i<n;i++){
-    var a=kind==="ring"?i/n*Math.PI*2:Math.random()*Math.PI*2;
-    var v=kind==="ring"?sp:sp*(.3+Math.random()*.8);
+  var i,a,v,t,c2=pick(COLS),n=70,sp=150;
+  if(kind==="heart"){
+    for(i=0;i<72;i++){t=i/72*Math.PI*2;var hx=16*Math.pow(Math.sin(t),3),hy=-(13*Math.cos(t)-5*Math.cos(2*t)-2*Math.cos(3*t)-Math.cos(4*t));
+      spawn(x,y,hx*6.5,hy*6.5,1.8,i%8===0?"#fff2c9":col,2.6,10,.965);}
+    flash=Math.max(flash,.22);return;
+  }
+  if(kind==="ring"){
+    for(i=0;i<44;i++){a=i/44*Math.PI*2;spawn(x,y,Math.cos(a)*140,Math.sin(a)*140,1.4,col,2.3,40,.975);}
+    for(i=0;i<28;i++){a=i/28*Math.PI*2;spawn(x,y,Math.cos(a)*78,Math.sin(a)*78,1.4,c2,2.1,40,.975);}
+    flash=Math.max(flash,.2);return;
+  }
+  if(kind==="twinkle"){
+    for(i=0;i<110;i++){a=Math.random()*Math.PI*2;v=95*(.2+Math.random()*.9);spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,2.1+Math.random()*1.2,i%3?"#ffd36a":"#ffffff",1.6,38,.97);}
+    flash=Math.max(flash,.16);return;
+  }
+  if(kind==="multi"||kind==="maha"){
+    var big=kind==="maha",nn=big?190:120,spd=big?215:175;
+    for(i=0;i<nn;i++){a=Math.random()*Math.PI*2;v=spd*(.3+Math.random()*.8);spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,(big?1.9:1.5)+Math.random()*.5,pick(COLS),big?2.8:2.3,50,.975);}
+    if(big){for(i=0;i<110;i++){a=Math.random()*Math.PI*2;v=125*(.4+Math.random()*.6);spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,2.9,"#ffd36a",1.8,75,.97);}shake=Math.max(shake,10);flash=Math.max(flash,.6);}
+    else flash=Math.max(flash,.25);
+    return;
+  }
+  if(kind==="double"){
+    burst(x,y,col,"peony");
+    setTimeout(function(){SFX.boom(.3);for(var k=0;k<5;k++)burst(x+(k-2)*40+(Math.random()-.5)*14,y+(Math.random()-.5)*40,pick(COLS),"peony");},430);
+    return;
+  }
+  if(kind==="willow"){n=60;sp=110;}
+  for(i=0;i<n;i++){
+    a=Math.random()*Math.PI*2;v=sp*(.3+Math.random()*.8);
     spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,kind==="willow"?2.2:1.3+Math.random()*.5,i%5===0?c2:col,kind==="willow"?1.6:2.2,kind==="willow"?70:50,kind==="willow"?.97:.975);
   }
   flash=Math.max(flash,.18);
@@ -338,13 +384,10 @@ function launch(x,col,kind,cb){
   R.push({x:x,y:GY+26,vx:(Math.random()-.5)*14,vy:-(300+Math.random()*60),ty:ty,c:col,k:kind});
   SFX.whistle(.7);
 }
+function skyX(xf){return xf!=null?xf*W:120+Math.random()*560;}
 var FW={
-  rocket:function(remote,xf){
-    var x=xf!=null?xf*W:120+Math.random()*560;launch(x,pick(COLS),pick(["peony","ring","willow"]));
-  },
-  laxmi:function(remote,xf){
-    var x=xf!=null?xf*W:AX+110;GB.push({x:x,t:0,fuse:1.1,boomed:false});SFX.fizz();
-  },
+  rocket:function(remote,xf){launch(skyX(xf),pick(COLS),pick(["peony","ring","willow"]));},
+  laxmi:function(remote,xf){var x=xf!=null?xf*W:AX+110;GB.push({x:x,t:0,fuse:1.1,boomed:false});SFX.fizz();},
   shots:function(remote,xf){
     var base=xf!=null?xf*W:200+Math.random()*400;
     for(var i=0;i<5;i++)(function(i){setTimeout(function(){
@@ -352,18 +395,49 @@ var FW={
       R.push({x:x,y:GY+26,vx:0,vy:-(380+Math.random()*50),ty:90+Math.random()*70,c:col,k:"peony",fast:true});SFX.pop();
     },i*230);})(i);
   },
-  chakri:function(remote,xf){
-    var x=xf!=null?xf*W:AX+100;CH.push({x:x,t:0,r:0});SFX.fizz();
+  chakri:function(remote,xf){var x=xf!=null?xf*W:AX+100;CH.push({x:x,t:0,r:0});SFX.fizz();},
+  spark:function(){SP.push({t:0});SFX.fizz();},
+  pop:function(remote,xf){
+    var base=xf!=null?xf*W:AX+60+Math.random()*200;
+    for(var i=0;i<7;i++)(function(i){setTimeout(function(){
+      var x=base+i*26;SFX.pop();
+      for(var k=0;k<10;k++){var a=-Math.PI*Math.random();spawn(x,396,Math.cos(a)*70,Math.sin(a)*90,.35+Math.random()*.2,pick(["#ffd36a","#ff8a1f","#fff2c9"]),2,120,.93);}
+      flash=Math.max(flash,.05);
+    },i*130);})(i);
   },
-  spark:function(){SP.push({t:0});SFX.fizz();}
+  anar:function(remote,xf){FN.push({x:xf!=null?xf*W:AX+120,t:0});SFX.fizz();},
+  bijli:function(remote,xf){
+    var base=xf!=null?xf*W-200:AX+40;
+    for(var i=0;i<14;i++)(function(i){setTimeout(function(){
+      var x=base+i*32;SFX.pop();
+      for(var k=0;k<9;k++){var a=-Math.PI*Math.random();spawn(x,394,Math.cos(a)*90,Math.sin(a)*100,.4,pick(["#ff3b3b","#ffcf4a","#ff8a1f"]),2.2,160,.93);}
+      flash=Math.max(flash,.07);
+    },i*110);})(i);
+  },
+  twinkle:function(remote,xf){launch(skyX(xf),"#ffd36a","twinkle");},
+  ring:function(remote,xf){launch(skyX(xf),pick(COLS),"ring");},
+  multi:function(remote,xf){launch(skyX(xf),pick(COLS),"multi");},
+  comet:function(remote,xf){
+    var x0=skyX(xf);
+    for(var i=0;i<5;i++)(function(i){setTimeout(function(){
+      R.push({x:x0+(i-2)*26,y:GY+26,vx:(i-2)*34,vy:-(330+Math.random()*40),ty:70+Math.random()*90,c:pick(COLS),k:"peony",fast:true,trail:true});SFX.whistle(.6);
+    },i*120);})(i);
+  },
+  double:function(remote,xf){launch(skyX(xf),pick(COLS),"double");},
+  heart:function(remote,xf){launch(skyX(xf),pick(["#ff3d81","#ff4d6d","#ff6aa8"]),"heart");},
+  maha:function(remote,xf){
+    for(var i=0;i<4;i++)(function(i){setTimeout(function(){launch(100+Math.random()*600,pick(COLS),"multi");},i*240);})(i);
+    setTimeout(function(){launch(W/2,"#ffd36a","maha");},1100);
+  }
 };
 G.FW=FW;
 function stepFW(dt){
   for(var i=R.length-1;i>=0;i--){
     var r=R[i];r.x+=r.vx*dt;r.y+=r.vy*dt;r.vy+=(r.fast?260:210)*dt;
     spawn(r.x,r.y,(Math.random()-.5)*20,20+Math.random()*30,.45,"#ffb347",1.4,0,.96);
+    if(r.trail)spawn(r.x,r.y,(Math.random()-.5)*14,10+Math.random()*20,.9,r.c,2,0,.97);
     if(r.vy>-60||r.y<=r.ty){
-      burst(r.x,r.y,r.c,r.k);SFX.boom(.35);if(Math.random()<.5)SFX.crackle(6);R.splice(i,1);
+      burst(r.x,r.y,r.c,r.k);SFX.boom(r.k==="maha"?1.8:(r.k==="multi"||r.k==="double")?.6:.35);if(Math.random()<.5)SFX.crackle(6);R.splice(i,1);
     }
   }
   for(var j=GB.length-1;j>=0;j--){
@@ -386,6 +460,12 @@ function stepFW(dt){
     for(var z=0;z<5;z++){var a2=Math.random()*Math.PI*2,v2=40+Math.random()*90;spawn(AX+22,GY-34,Math.cos(a2)*v2,Math.sin(a2)*v2-20,.5+Math.random()*.3,pick(["#fff2c9","#ffd36a","#ffffff"]),1.5,120,.93);}
     if(sp.t>4.5)SP.splice(s,1);
   }
+  for(var fi=FN.length-1;fi>=0;fi--){
+    var f=FN[fi];f.t+=dt;
+    for(var fk=0;fk<4;fk++)spawn(f.x+(Math.random()-.5)*8,392,(Math.random()-.5)*70,-170-Math.random()*120,.9+Math.random()*.5,pick(COLS),2,260,.98);
+    if(f.t>3.2)FN.splice(fi,1);
+  }
+  for(var gi2=GR.length-1;gi2>=0;gi2--){GR[gi2].t+=dt;if(GR[gi2].t>2.8)GR.splice(gi2,1);}
   for(var p=P.length-1;p>=0;p--){
     var q2=P[p];q2.l-=dt;if(q2.l<=0){P.splice(p,1);continue;}
     q2.vx*=q2.d;q2.vy=q2.vy*q2.d+q2.g*dt;q2.x+=q2.vx*dt;q2.y+=q2.vy*dt;
@@ -394,7 +474,10 @@ function stepFW(dt){
   flash=Math.max(0,flash-dt*1.6);shake=Math.max(0,shake-dt*30);
 }
 G.fwCount=function(){return R.length+GB.length+CH.length};
-G.cvParts={P:P,R:R,GB:GB,CH:CH,SP:SP,COLS:COLS};
+var FN=[],GR=[];
+var GREET2=["शुभ दीपावली!","Shubh Deepavali!","Subho Deepabali!","Deepavali Nalvazhthukkal!","Shubh Labh!","Diwali Mubarak!","दीपावली की शुभकामनाएँ!","Jai Laxmi Mata!"],gi=0,lastGreet=0;
+G.greet=function(){var now=performance.now();if(now-lastGreet<700||GR.length>=4)return;lastGreet=now;GR.push({x:150+Math.random()*500,y:90+Math.random()*80,t:0,b:GREET2[gi++%GREET2.length]});};
+G.cvParts={P:P,R:R,GB:GB,CH:CH,SP:SP,FN:FN,GR:GR,COLS:COLS};
 G.stepFW=stepFW;
 G.getFlash=function(){return flash};
 G.getShake=function(){return shake};
@@ -406,15 +489,30 @@ window.__G=G;
 (function(){
 "use strict";
 var G=window.__G,$=G.$;
-var PXM=12,GOAL=2000,W=800,H=440,GY=372,AX=250;
+var PXM=12,GOAL=4000,W=800,H=440,GY=372,AX=250;
 var cv=$("cv"),ctx=cv.getContext("2d");
 var V=G.cvParts;
 G.CLOTH={
-  kurta:{g:"m",name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
-  sherwani:{g:"m",name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"},
-  anarkali:{g:"f",name:"Anarkali suit",price:0,top:"#8f3bd1",bot:"#f3e6c8",trim:"#ffd36a"},
-  saree:{g:"f",name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
-  lehenga:{g:"f",name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"}
+  kurta:{g:"m",shape:"kurta",name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
+  printed:{g:"m",shape:"kurta",name:"Printed festive kurta",price:80,top:"#c4285f",bot:"#f3e6c8",trim:"#ffd36a"},
+  nehru:{g:"m",shape:"vest",name:"Nehru jacket set",price:140,top:"#1f6f8b",bot:"#f3e6c8",trim:"#ffd36a"},
+  dhoti:{g:"m",shape:"dhoti",name:"Dhoti kurta",price:200,top:"#ff8a1f",bot:"#fbf0dc",trim:"#b8860b"},
+  pathani:{g:"m",shape:"long",name:"Pathani suit",price:260,top:"#2f7d6d",bot:"#2f7d6d",trim:"#f3e6c8"},
+  jodhpuri:{g:"m",shape:"jacket",name:"Jodhpuri suit",price:330,top:"#2b2d6e",bot:"#1c1c3a",trim:"#ffd36a"},
+  sherwani:{g:"m",shape:"long",name:"Silk sherwani",price:400,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"},
+  bandhgala:{g:"m",shape:"jacket",name:"Bandhgala suit",price:480,top:"#0f6b4f",bot:"#14221c",trim:"#d9a441"},
+  safa:{g:"m",shape:"long",name:"Royal sherwani and safa",price:620,top:"#a31d45",bot:"#f3e6c8",trim:"#ffd36a",acc:"#ff8a1f",turban:true},
+  maharaja:{g:"m",shape:"long",name:"Maharaja set",price:850,top:"#d9a441",bot:"#7b1530",trim:"#fff2c9",acc:"#7b1530",turban:true,shawl:true},
+  anarkali:{g:"f",shape:"anarkali",name:"Anarkali suit",price:0,top:"#8f3bd1",bot:"#f3e6c8",trim:"#ffd36a",acc:"#ff6aa8"},
+  palazzo:{g:"f",shape:"palazzo",name:"Kurti and palazzo",price:90,top:"#ff8a1f",bot:"#f3e6c8",trim:"#fff2c9"},
+  salwar:{g:"f",shape:"salwar",name:"Salwar kameez",price:150,top:"#e8317a",bot:"#e8317a",trim:"#ffd36a",acc:"#ffd36a"},
+  cotton:{g:"f",shape:"saree",name:"Cotton saree",price:210,top:"#2f7d6d",bot:"#2f7d6d",trim:"#f3e6c8"},
+  gharara:{g:"f",shape:"gharara",name:"Gharara set",price:280,top:"#7a3bd1",bot:"#e8317a",trim:"#ffd36a"},
+  saree:{g:"f",shape:"saree",name:"Silk saree",price:350,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
+  lehenga:{g:"f",shape:"lehenga",name:"Lehenga choli",price:450,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"},
+  banarasi:{g:"f",shape:"saree",name:"Banarasi saree",price:580,top:"#b8151f",bot:"#b8151f",trim:"#ffcf4a"},
+  bridal:{g:"f",shape:"lehenga",name:"Bridal lehenga",price:740,top:"#a50e2a",bot:"#c1121f",trim:"#ffcf4a"},
+  rani:{g:"f",shape:"gown",name:"Rani gown and crown",price:950,top:"#4b1d8f",bot:"#4b1d8f",trim:"#ffd36a",crown:true}
 };
 function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
 /* sky */
@@ -422,20 +520,29 @@ var sky=ctx.createLinearGradient(0,0,0,340);
 sky.addColorStop(0,"#07030f");sky.addColorStop(.55,"#251042");sky.addColorStop(1,"#6a2a62");
 var stars=[];for(var i=0;i<90;i++)stars.push({x:rnd(i,1)*W,y:rnd(i,2)*230,r:.4+rnd(i,3)*1.1,p:rnd(i,4)*6});
 var WALLS=["#e0912c","#c4285f","#14948a","#6c3ec0","#d96a2a","#b0306f"];
-var tt=0,phase=0,moving=false,walkHeld=false,runHeld=false,keyW=false,keyR=false;
+var tt=0,phase=0,moving=false,walkHeld=false,runHeld=false,keyW=false,keyR=false,tired=false,WALKV=9;
 
 function glow(x,y,r,col,a){
   var g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(255,160,40,0)");
   ctx.globalAlpha=a;ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.globalAlpha=1;
 }
 function diya(x,y,sc,kind){
-  var col=kind==="brass"?"#d9a441":kind==="kandil"?"#ff6a3d":"#b5562a";
-  ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,7*sc,3.4*sc,0,0,Math.PI);ctx.fill();
-  ctx.fillStyle="#ffb347";var f=1+Math.sin(tt*9+x*.7)*.18;
-  ctx.beginPath();ctx.ellipse(x,y-4*sc*f,2*sc,4.6*sc*f,0,0,Math.PI*2);ctx.fill();
-  ctx.fillStyle="#fff3c4";ctx.beginPath();ctx.ellipse(x,y-3*sc,.9*sc,2.2*sc,0,0,Math.PI*2);ctx.fill();
+  var f=1+Math.sin(tt*9+x*.7)*.18,k;
+  function bowl(col,w){ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,(w||7)*sc,3.4*sc,0,0,Math.PI);ctx.fill();}
+  function flame(dx,h){h=h||1;ctx.fillStyle="#ffb347";ctx.beginPath();ctx.ellipse(x+dx*sc,y-4*sc*h*f,2*sc,4.6*sc*h*f,0,0,7);ctx.fill();ctx.fillStyle="#fff3c4";ctx.beginPath();ctx.ellipse(x+dx*sc,y-3*sc*h,.9*sc,2.2*sc*h,0,0,7);ctx.fill();}
+  switch(kind){
+    case "painted":bowl("#b5562a");ctx.fillStyle="#ff3d81";for(k=-1;k<=1;k++){ctx.beginPath();ctx.arc(x+k*3.4*sc,y+1.4*sc,.9*sc,0,7);ctx.fill();}ctx.fillStyle="#ffcf4a";ctx.fillRect(x-6*sc,y-.4*sc,12*sc,.8*sc);flame(0);break;
+    case "wick2":bowl("#b5562a",9);flame(-3);flame(3);break;
+    case "brass":bowl("#d9a441");flame(0);break;
+    case "peacock":ctx.fillStyle="#19b3a6";for(k=-2;k<=2;k++){ctx.beginPath();ctx.ellipse(x+k*3.6*sc,y-6*sc-Math.abs(k)*-.6*sc,1.8*sc,5*sc,k*.28,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(x+k*4*sc,y-9*sc+Math.abs(k)*1.2*sc,1*sc,0,7);ctx.fill();ctx.fillStyle="#19b3a6";}bowl("#17857c",8);flame(0);break;
+    case "lotus":ctx.fillStyle="#ff6aa8";for(k=-2;k<=2;k++){ctx.beginPath();ctx.ellipse(x+k*3.4*sc,y-1.5*sc,1.9*sc,4*sc,k*.45,0,7);ctx.fill();}bowl("#e8317a",8);flame(0);break;
+    case "silver":bowl("#d7dbe4",8);ctx.fillStyle="#fff";ctx.fillRect(x-5*sc,y-.3*sc,3*sc,.7*sc);flame(0);break;
+    case "samai":ctx.fillStyle="#d9a441";ctx.fillRect(x-1*sc,y,2*sc,8*sc);ctx.beginPath();ctx.ellipse(x,y+8*sc,5*sc,1.8*sc,0,0,7);ctx.fill();bowl("#e0b050",6);flame(0,1.3);break;
+    case "akhand":ctx.fillStyle="#9c6f1c";ctx.fillRect(x-1.5*sc,y,3*sc,6*sc);bowl("#f0c040",11);ctx.fillStyle="#fff2c9";ctx.fillRect(x-8*sc,y-.4*sc,16*sc,.8*sc);flame(0,1.9);break;
+    default:bowl("#b5562a");flame(0);
+  }
 }
-function lampTypes(){var l=G.S.lamps,a=[],i;for(i=0;i<l.kandil;i++)a.push("kandil");for(i=0;i<l.brass;i++)a.push("brass");for(i=0;i<l.clay;i++)a.push("clay");return a;}
+function lampTypes(){var l=G.S.lamps||{},a=[],i,ids=["akhand","silver","samai","kandil","lotus","peacock","brass","wick2","painted","clay"];ids.forEach(function(id){for(i=0;i<(l[id]||0);i++)a.push(id);});return a;}
 
 function drawSky(wp){
   ctx.fillStyle=sky;ctx.fillRect(0,0,W,350);
@@ -515,26 +622,37 @@ function rangoli(x,y,k){
   ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(0,0,6,0,7);ctx.fill();ctx.restore();
 }
 function drawAvatar(){
-  var c=G.CLOTH[G.S.wear]||G.CLOTH.kurta,sw=moving?Math.sin(phase)*.65:0,wear=G.S.wear;
+  var c=G.CLOTH[G.S.wear]||G.CLOTH.kurta,sw=moving?Math.sin(phase)*.65:0,sh=c.shape,fem=(G.S.gender==="f"),b;
   ctx.save();ctx.translate(AX,GY);
   ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,26,22,6,0,0,7);ctx.fill();
-  ctx.strokeStyle=(wear==="saree"||wear==="lehenga"||wear==="anarkali")?c.bot:"#f3e6c8";ctx.lineWidth=7;ctx.lineCap="round";
+  if(fem){ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.ellipse(-7,-40,8,24,0,0,7);ctx.fill();ctx.fillStyle="#e8317a";ctx.fillRect(-12,-24,10,3);}
+  ctx.strokeStyle=c.bot;ctx.lineWidth=7;ctx.lineCap="round";
   ctx.beginPath();ctx.moveTo(-4,-8);ctx.lineTo(-4+Math.sin(sw)*18,22);ctx.moveTo(4,-8);ctx.lineTo(4-Math.sin(sw)*18,22);ctx.stroke();
   ctx.strokeStyle="#b97a55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-4+Math.sin(sw)*18,22);ctx.lineTo(-4+Math.sin(sw)*18+4,25);ctx.moveTo(4-Math.sin(sw)*18,22);ctx.lineTo(4-Math.sin(sw)*18+4,25);ctx.stroke();
   ctx.fillStyle=c.top;
-  if(wear==="lehenga"){ctx.fillRect(-9,-44,18,18);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-26);ctx.lineTo(9,-26);ctx.lineTo(22,16);ctx.lineTo(-22,16);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-22,12,44,4);}
-  else if(wear==="saree"){ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-46);ctx.lineTo(12,18);ctx.lineTo(-12,18);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-12,14,24,4);ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-14);ctx.lineTo(9,-8);ctx.lineTo(-9,-40);ctx.fill();}
-  else if(wear==="anarkali"){ctx.fillRect(-9,-46,18,26);ctx.beginPath();ctx.moveTo(-9,-22);ctx.lineTo(9,-22);ctx.lineTo(19,8);ctx.lineTo(-19,8);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-19,4,38,4);ctx.fillRect(-9,-24,18,3);ctx.fillStyle="#ff6aa8";ctx.beginPath();ctx.moveTo(-9,-44);ctx.lineTo(9,-44);ctx.lineTo(-2,6);ctx.lineTo(-9,6);ctx.fill();}
-  else if(wear==="sherwani"){ctx.fillRect(-10,-46,20,64);ctx.fillStyle=c.trim;for(var b=0;b<5;b++)ctx.fillRect(-1,-40+b*10,3,3);ctx.fillRect(-10,14,20,4);}
-  else{ctx.fillRect(-10,-46,20,52);ctx.fillStyle=c.trim;ctx.fillRect(-10,2,20,3);ctx.fillRect(-1,-46,2,16);}
+  switch(sh){
+    case "lehenga":ctx.fillRect(-9,-44,18,18);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-26);ctx.lineTo(9,-26);ctx.lineTo(22,16);ctx.lineTo(-22,16);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-22,12,44,4);ctx.fillRect(-9,-27,18,3);break;
+    case "saree":ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-46);ctx.lineTo(12,18);ctx.lineTo(-12,18);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-12,14,24,4);ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-14);ctx.lineTo(9,-8);ctx.lineTo(-9,-40);ctx.fill();break;
+    case "anarkali":ctx.fillRect(-9,-46,18,26);ctx.beginPath();ctx.moveTo(-9,-22);ctx.lineTo(9,-22);ctx.lineTo(19,8);ctx.lineTo(-19,8);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-19,4,38,4);ctx.fillRect(-9,-24,18,3);ctx.fillStyle=c.acc;ctx.beginPath();ctx.moveTo(-9,-44);ctx.lineTo(9,-44);ctx.lineTo(-2,6);ctx.lineTo(-9,6);ctx.fill();break;
+    case "gown":ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-46);ctx.lineTo(10,-20);ctx.lineTo(23,20);ctx.lineTo(-23,20);ctx.lineTo(-10,-20);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-10,-22,20,3);ctx.fillRect(-23,16,46,4);break;
+    case "palazzo":ctx.fillRect(-9,-46,18,40);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-8);ctx.lineTo(9,-8);ctx.lineTo(17,22);ctx.lineTo(-17,22);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-9,-8,18,3);break;
+    case "salwar":ctx.fillRect(-9,-46,18,46);ctx.fillStyle=c.acc;ctx.beginPath();ctx.moveTo(-9,-44);ctx.lineTo(9,-44);ctx.lineTo(11,-20);ctx.lineTo(9,-20);ctx.lineTo(-9,-38);ctx.fill();ctx.fillRect(-9,-4,18,3);break;
+    case "gharara":ctx.fillRect(-9,-46,18,26);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-20);ctx.lineTo(9,-20);ctx.lineTo(21,22);ctx.lineTo(-21,22);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-21,18,42,4);ctx.fillRect(-9,-21,18,3);break;
+    case "vest":ctx.fillStyle=c.bot;ctx.fillRect(-10,-46,20,52);ctx.fillStyle=c.top;ctx.beginPath();ctx.moveTo(-10,-46);ctx.lineTo(-3,-46);ctx.lineTo(0,-36);ctx.lineTo(3,-46);ctx.lineTo(10,-46);ctx.lineTo(10,-8);ctx.lineTo(-10,-8);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-1,-36,2,28);break;
+    case "dhoti":ctx.fillRect(-10,-46,20,36);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-10,-12);ctx.lineTo(10,-12);ctx.lineTo(14,22);ctx.lineTo(-14,22);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-14,18,28,4);ctx.fillRect(-10,-12,20,3);break;
+    case "jacket":ctx.fillStyle=c.bot;ctx.fillRect(-10,-12,20,34);ctx.fillStyle=c.top;ctx.fillRect(-10,-46,20,40);ctx.fillStyle=c.trim;for(b=0;b<4;b++)ctx.fillRect(-1,-42+b*9,3,3);ctx.fillRect(-10,-8,20,2);break;
+    case "long":ctx.fillRect(-10,-46,20,64);ctx.fillStyle=c.trim;for(b=0;b<5;b++)ctx.fillRect(-1,-40+b*10,3,3);ctx.fillRect(-10,14,20,4);break;
+    default:ctx.fillRect(-10,-46,20,52);ctx.fillStyle=c.trim;ctx.fillRect(-10,2,20,3);ctx.fillRect(-1,-46,2,16);
+  }
   ctx.strokeStyle=c.top;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-9,-42);ctx.lineTo(-9-Math.sin(sw)*12,-14);ctx.stroke();
   ctx.beginPath();ctx.moveTo(9,-42);ctx.lineTo(9+Math.sin(sw)*12,-14);ctx.stroke();
-  var fem=(G.S.gender==="f");
-  if(fem){ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.ellipse(-7,-40,8,24,0,0,7);ctx.fill();ctx.fillStyle="#e8317a";ctx.fillRect(-12,-24,10,3);}
+  if(c.shawl){ctx.strokeStyle=c.acc;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-8,-44);ctx.lineTo(8,-8);ctx.stroke();}
   ctx.fillStyle="#d9a07a";ctx.beginPath();ctx.arc(0,-56,10,0,7);ctx.fill();
   ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.arc(0,-59,10.5,Math.PI,0);ctx.fill();
-  if(fem){ctx.fillRect(-11,-62,6,16);ctx.fillStyle="#d6243a";ctx.beginPath();ctx.arc(5,-60,1.7,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(1,-50,2,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.fillRect(-7,-68,3,3);}
+  if(fem){ctx.fillRect(-11,-62,6,16);ctx.fillStyle="#d6243a";ctx.beginPath();ctx.arc(5,-60,1.7,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(1,-50,2,0,7);ctx.fill();ctx.fillRect(-7,-68,3,3);}
   else{ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(4,-56,1.6,0,7);ctx.fill();}
+  if(c.turban){ctx.fillStyle=c.acc;ctx.beginPath();ctx.ellipse(0,-64,12.5,8,0,0,7);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-12,-62,24,3);ctx.fillStyle=c.acc;ctx.fillRect(-15,-64,5,14);ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(0,-66,2.2,0,7);ctx.fill();}
+  if(c.crown){ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.moveTo(-9,-66);ctx.lineTo(-7,-77);ctx.lineTo(-3,-70);ctx.lineTo(0,-79);ctx.lineTo(3,-70);ctx.lineTo(7,-77);ctx.lineTo(9,-66);ctx.fill();}
   if(V.SP.length){ctx.strokeStyle="#d9d9d9";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(22,-34);ctx.lineTo(14,-22);ctx.stroke();glow(22,-34,22,"rgba(255,230,160,1)",.6);}
   ctx.restore();ctx.lineWidth=1;
 }
@@ -547,12 +665,26 @@ function drawFW(){
   ctx.globalAlpha=1;ctx.lineWidth=1;ctx.globalCompositeOperation="source-over";
   for(var b2=0;b2<V.GB.length;b2++){var q=V.GB[b2];if(!q.boomed){ctx.fillStyle="#c1121f";ctx.fillRect(q.x-5,380,10,16);ctx.fillStyle="#ffcf4a";ctx.fillRect(q.x-5,386,10,3);ctx.strokeStyle="#ffcf4a";ctx.beginPath();ctx.moveTo(q.x,380);ctx.lineTo(q.x+5,372);ctx.stroke();}}
   for(var c=0;c<V.CH.length;c++){var ch=V.CH[c];ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.ellipse(ch.x,396,9,3,0,0,7);ctx.fill();}
+  for(var fi=0;fi<V.FN.length;fi++){var fn=V.FN[fi];ctx.fillStyle="#b5562a";ctx.beginPath();ctx.moveTo(fn.x-7,396);ctx.lineTo(fn.x+7,396);ctx.lineTo(fn.x+4,382);ctx.lineTo(fn.x-4,382);ctx.fill();}
+  for(var gq=0;gq<V.GR.length;gq++){
+    var q=V.GR[gq],kk=q.t/2.8,al=kk<.12?kk/.12:Math.max(0,1-(kk-.55)/.45);
+    ctx.globalAlpha=Math.max(0,Math.min(1,al));ctx.textAlign="center";ctx.shadowColor="#ff8a1f";ctx.shadowBlur=16;
+    ctx.fillStyle="#ffe9a8";ctx.font="700 26px 'Yatra One',Georgia,serif";ctx.fillText("Happy Diwali to all!",q.x,q.y-kk*18);
+    ctx.fillStyle="#ffc83d";ctx.font="700 16px Mukta,sans-serif";ctx.fillText(q.b,q.x,q.y+22-kk*18);
+    ctx.shadowBlur=0;
+  }
+  ctx.globalAlpha=1;ctx.textAlign="start";
 }
 var last=performance.now(),uiT=0;
 function frame(now){
   var dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
-  var S=G.S,run=runHeld||keyR,go=walkHeld||keyW||run||$("auto").checked;
-  var v=go?(run?24:14):0;moving=v>0;
+  var S=G.S,wantRun=runHeld||keyR,go=walkHeld||keyW||wantRun;
+  if(typeof S.stam!=="number")S.stam=100;
+  if(tired&&S.stam>=25)tired=false;
+  if(!tired&&wantRun&&S.stam<=0){tired=true;G.toast("Out of breath! Keep walking to recover.");}
+  var run=wantRun&&!tired;
+  var v=go?(run?WALKV*2:WALKV):0;moving=v>0;
+  if(run)S.stam=Math.max(0,S.stam-6*dt);else S.stam=Math.min(100,S.stam+(go?3:10)*dt);
   if(moving){S.dist+=v*dt;S.walked+=v*dt;phase+=v*dt*.75;}
   G.stepFW(dt);
   if(G.update)G.update(dt);
@@ -562,7 +694,7 @@ function frame(now){
   drawSky(wp);drawHouses(wp);drawRoad(wp);drawAvatar();drawFW();
   var fl=G.getFlash();if(fl>0){ctx.globalAlpha=Math.min(.55,fl*.6);ctx.fillStyle="#fff5d6";ctx.fillRect(-20,-20,W+40,H+40);ctx.globalAlpha=1;}
   ctx.textAlign="start";
-  uiT+=dt;if(uiT>.1){uiT=0;$("dist").textContent=Math.floor(S.dist);$("fill").style.width=Math.min(100,S.dist/GOAL*100)+"%";}
+  uiT+=dt;if(uiT>.1){uiT=0;$("dist").textContent=Math.floor(S.dist);$("fill").style.width=Math.min(100,S.dist/GOAL*100)+"%";var sb=$("stam");sb.style.width=Math.max(0,Math.min(100,S.stam))+"%";sb.parentNode.parentNode.classList.toggle("low",tired);}
   requestAnimationFrame(frame);
 }
 function hold(btn,on){
@@ -574,7 +706,7 @@ window.addEventListener("keydown",function(e){
   var t=e.target&&e.target.tagName;if(t==="INPUT"||t==="TEXTAREA")return;
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D"){keyW=true;keyR=e.shiftKey;G.ac();e.preventDefault();}
   if(e.key==="Shift")keyR=keyW;
-  var n=parseInt(e.key,10);if(n>=1&&n<=5&&G.fireKey)G.fireKey(n-1);
+  var n=parseInt(e.key,10);if(n>=1&&n<=9&&G.fireKey)G.fireKey(n-1);
 });
 window.addEventListener("keyup",function(e){
   if(e.key==="ArrowRight"||e.key==="d"||e.key==="D")keyW=false;
@@ -602,11 +734,11 @@ tabs.forEach(function(t){t.addEventListener("click",function(){
 
 /* ---------- tasks ---------- */
 var TASKS=[
- {n:"Walk 400 m to the rangoli chowk",par:45,kind:"walk",need:400,tip:"Hold Walk or Run on the street."},
- {n:"Light 6 diyas at your doorstep",par:25,kind:"diya",need:6,tip:"Tap the lamps below."},
- {n:"Pray at all three shrines",par:70,kind:"pray",need:3,tip:"Ganesh, Laxmi and Saraswati, in the Mandir tab."},
- {n:"Burst 5 crackers",par:35,kind:"crack",need:5,tip:"Use the Crackers tab or keys 1 to 5."},
- {n:"Walk 800 m on towards the Mela gate",par:80,kind:"walk",need:800,tip:"Run to save time."}
+ {n:"Walk 600 m to the rangoli chowk",par:70,r:120,kind:"walk",need:600,tip:"Hold Walk, or Run in short bursts."},
+ {n:"Light 8 diyas at your doorstep",par:30,r:100,kind:"diya",need:8,tip:"Tap the lamps below."},
+ {n:"Pray at all three shrines",par:80,r:150,kind:"pray",need:3,tip:"Ganesh, Laxmi and Saraswati, in the Mandir tab."},
+ {n:"Burst 7 crackers",par:50,r:150,kind:"crack",need:7,tip:"Buy more in the Crackers tab if you run out."},
+ {n:"Cover 1200 m towards the Mela gate",par:150,r:250,kind:"walk",need:1200,tip:"Manage your stamina: walk to recover."}
 ];
 function mult(e,par){var r=e/par;if(r<=.5)return 2;if(r>=2)return .25;return 2-(r-.5)*(1.75/1.5);}
 function bless(){return 1+.1*Object.keys(st().blessed).length;}
@@ -615,11 +747,11 @@ function prog(t){var s=st(),b=s.base;
   if(t.kind==="diya")return Math.min(t.need,s.diyas-b.diyas);
   if(t.kind==="pray")return Math.min(t.need,(s.prays||0)-(b.prays||0));
   return Math.min(t.need,s.bursts-b.bursts);}
-function nowCoins(t){return Math.round(100*mult(st().el||0,t.par)*bless());}
+function nowCoins(t){return Math.round((t.r||100)*mult(st().el||0,t.par)*bless());}
 function startTask(){var s=st();s.run=true;s.el=0;s.base={walked:s.walked,bursts:s.bursts,diyas:s.diyas,prays:s.prays||0};
   renderTasks();G.toast("Task started. Go!");SFX.clink();G.save();}
 function finishTask(){
-  var s=st(),t=TASKS[s.ti],m=mult(s.el,t.par),c=Math.round(100*m*bless());
+  var s=st(),t=TASKS[s.ti],m=mult(s.el,t.par),c=Math.round((t.r||100)*m*bless());
   s.coins+=c;s.res.push({c:c,m:m,e:s.el});s.run=false;s.ti++;s.el=0;
   SFX.coin();coinsUI();G.toast("Task done! +"+c+" coins (x"+(m*bless()).toFixed(2)+")");
   G.FW.rocket(false,.3);setTimeout(function(){G.FW.rocket(false,.7)},250);
@@ -631,19 +763,19 @@ function renderTasks(){
     var row=el("div","task"+(i===s.ti?" act":"")+(i<s.ti?" done":""));
     row.appendChild(el("div","tn",i<s.ti?"✓":String(i+1)));
     var b=el("div","tbody");b.appendChild(el("b",null,t.n));
-    if(i<s.ti){var r=s.res[i];b.appendChild(el("small",null,"Done in "+Math.round(r.e)+"s of "+t.par+"s · earned "+r.c+" coins"));}
+    if(i<s.ti){var r=s.res[i]||{e:0,c:0};b.appendChild(el("small",null,"Done in "+Math.round(r.e)+"s of "+t.par+"s · earned "+r.c+" coins"));}
     else if(i===s.ti&&s.run){var sm=el("small");sm.id="tlive";b.appendChild(sm);
       if(t.kind==="diya"){var dw=el("div","diyas");dw.style.marginTop="8px";
         for(var d=0;d<t.need;d++)(function(d){var bt=el("button","diya");bt.type="button";bt.setAttribute("aria-label","Light diya "+(d+1));
           bt.textContent="🪔";bt.addEventListener("click",function(){if(bt.classList.contains("lit"))return;bt.classList.add("lit");st().diyas++;SFX.clink();G.save();});dw.appendChild(bt);})(d);
         b.appendChild(dw);}}
-    else b.appendChild(el("small",null,"Target "+t.par+"s · "+t.tip));
+    else b.appendChild(el("small",null,"Target "+t.par+"s · up to "+Math.round((t.r||100)*2*bless())+" coins · "+t.tip));
     row.appendChild(b);
     if(i===s.ti&&!s.run){var go=el("button","btn pri","Start");go.type="button";go.addEventListener("click",startTask);row.appendChild(go);}
     box.appendChild(row);
   });
   var done=s.ti>=TASKS.length;$("end").classList.toggle("on",done);
-  if(done){var tot=s.res.reduce(function(a,r){return a+r.c},0);$("endtxt").textContent="All five tasks done. You earned "+tot+" coins from tasks and now hold "+s.coins+". Keep walking to the Mela gate, burst the rest of your crackers or shop for lamps and clothes.";}
+  if(done){var tot=s.res.reduce(function(a,r){return a+r.c},0);$("endtxt").textContent="All five tasks done. You earned "+tot+" coins from tasks and now hold "+s.coins+". Head on to the Mela gate at 4 km, burst the rest of your crackers or shop for lamps and clothes.";}
   liveTask();
 }
 function liveTask(){
@@ -653,42 +785,57 @@ function liveTask(){
   var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
 $("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
-function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
+function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
 var acc=0,saveAcc=0;
 G.update=function(dt){
   var s=st();acc+=dt;saveAcc+=dt;
   if(s.run){s.el=(s.el||0)+dt;var t=TASKS[s.ti];if(t&&prog(t)>=t.need){finishTask();}}
   if(acc>.25){acc=0;liveTask();}
   if(saveAcc>3){saveAcc=0;G.save();}
-  if(!s.gateDone&&s.dist>=2000){s.gateDone=true;s.coins+=60;coinsUI();G.toast("You reached the Diwali Mela gate! +60 coins");
+  if(!s.gate4&&s.dist>=4000){s.gate4=true;s.coins+=150;coinsUI();G.toast("You reached the Diwali Mela gate! +150 coins");
     [.2,.4,.6,.8].forEach(function(x,i){setTimeout(function(){G.FW.rocket(false,x)},i*300);});SFX.coin();G.save();}
 };
 
 /* ---------- crackers ---------- */
 var CR=[
- {id:"rocket",n:"Rocket",d:"Whistles up and blooms"},
- {id:"laxmi",n:"Laxmi bomb",d:"One huge bang, shakes the street"},
- {id:"shots",n:"Sky shots",d:"Five shots in a row"},
- {id:"chakri",n:"Chakri",d:"Ground spinner of sparks"},
- {id:"spark",n:"Phooljhari",d:"Sparkler in your hand"}
+ {id:"spark",n:"Phooljhari",d:"Hand sparkler",p:10,col:"#fff2c9"},
+ {id:"pop",n:"Pop-pop snaps",d:"A row of tiny pops",p:15,col:"#c8b6a6"},
+ {id:"chakri",n:"Chakri",d:"Ground spinner of sparks",p:20,col:"#ff8a1f"},
+ {id:"anar",n:"Anar fountain",d:"Fountain of colourful sparks",p:30,col:"#ffb347"},
+ {id:"bijli",n:"Bijli string",d:"Chain of red bangs along the road",p:40,col:"#d62828"},
+ {id:"rocket",n:"Rocket",d:"Whistles up and blooms",p:55,col:"#ff3d81"},
+ {id:"laxmi",n:"Laxmi bomb",d:"One huge bang, shakes the street",p:70,col:"#c1121f"},
+ {id:"shots",n:"Sky shots",d:"Five shots in a row",p:90,col:"#8f5bff"},
+ {id:"twinkle",n:"Twinkling star",d:"Golden glitter that hangs and falls",p:110,col:"#ffd36a"},
+ {id:"ring",n:"Double ring shell",d:"Two glowing rings",p:140,col:"#2fd7c4"},
+ {id:"multi",n:"Colour burst shell",d:"Big multi-colour bloom",p:170,col:"#4aa8ff"},
+ {id:"comet",n:"Comet fan",d:"Five comets in a fan",p:210,col:"#7dff6a"},
+ {id:"double",n:"Double-break shell",d:"Blooms, then blooms again",p:260,col:"#ff6a3d"},
+ {id:"heart",n:"Heart shell",d:"A heart of light in the sky",p:320,col:"#ff4d8d"},
+ {id:"maha",n:"Maha Diwali shell",d:"Grand finale with a thunder boom",p:450,col:"#ffcf4a"}
 ];
+var POS={rocket:1,shots:1,twinkle:1,ring:1,multi:1,comet:1,double:1,heart:1,maha:1};
 var nr=null,nick="";
 function fire(id){
   var s=st();G.ac();
-  if(!(s.inv[id]>0)){G.toast("Out of "+id+". Buy more in the Shop.");return;}
+  var cr=CR.filter(function(c){return c.id===id})[0];
+  if(!((s.inv[id]||0)>0)){G.toast("Out of "+(cr?cr.n:id)+". Buy more below.");return;}
   s.inv[id]--;s.bursts++;
-  var xf=(id==="rocket"||id==="shots")?.15+Math.random()*.7:null;
-  G.FW[id](false,xf);
+  var xf=POS[id]?(.15+Math.random()*.7):null;
+  G.FW[id](false,xf);G.greet();
   if(nr){try{nr.emit("burst",{k:id,x:xf,n:nick}).catch(function(){});}catch(e){}}
   renderCrackers();renderShop();G.save();
 }
 G.fireKey=function(i){if(CR[i])fire(CR[i].id);};
 function renderCrackers(){
-  var g=$("crgrid");g.textContent="";
+  var g=$("crgrid"),s=st();g.textContent="";
   CR.forEach(function(c,i){
-    var card=el("div","card"),r=el("div","row");r.appendChild(el("b",null,(i+1)+". "+c.n));r.appendChild(el("span","price","x"+st().inv[c.id]));
-    card.appendChild(r);card.appendChild(el("span","muted",c.d));
-    var b=el("button","btn pri","Burst!");b.type="button";b.disabled=!(st().inv[c.id]>0);b.addEventListener("click",function(){fire(c.id)});card.appendChild(b);g.appendChild(card);
+    var card=el("div","card"),r=el("div","row"),sw=el("div","sw");sw.style.background=c.col;
+    var nm=el("div");nm.style.flex="1";nm.appendChild(el("b",null,(i<9?(i+1)+". ":"")+c.n));var sm=el("small","muted",c.d);sm.style.display="block";nm.appendChild(sm);
+    r.appendChild(sw);r.appendChild(nm);r.appendChild(el("span","price","x"+(s.inv[c.id]||0)));card.appendChild(r);
+    var row=el("div","row"),b=el("button","btn pri","Burst!");b.type="button";b.disabled=!((s.inv[c.id]||0)>0);b.addEventListener("click",function(){fire(c.id)});
+    var by=el("button","btn","Buy 🪙 "+c.p);by.type="button";by.disabled=s.coins<c.p;by.addEventListener("click",function(){buy("crackers",{id:c.id,n:c.n,p:c.p})});
+    row.appendChild(b);row.appendChild(by);card.appendChild(row);g.appendChild(card);
   });
 }
 
@@ -725,10 +872,22 @@ function doStep(s,i){
 }
 
 /* ---------- shop ---------- */
+var LAMPS=[
+ {id:"clay",n:"Clay diya",p:30,col:"#b5562a",d:"Classic terracotta lamp"},
+ {id:"painted",n:"Painted diya",p:50,col:"#ff3d81",d:"Hand-painted with bright dots"},
+ {id:"wick2",n:"Double-wick diya",p:75,col:"#c56b26",d:"Two flames in one lamp"},
+ {id:"brass",n:"Brass diya",p:100,col:"#d9a441",d:"Golden glow"},
+ {id:"peacock",n:"Peacock diya",p:140,col:"#19b3a6",d:"Feather fan behind the flame"},
+ {id:"lotus",n:"Lotus diya",p:190,col:"#e8317a",d:"Pink lotus petals"},
+ {id:"kandil",n:"Akash kandil",p:250,col:"#ff6a3d",d:"Hanging star lantern"},
+ {id:"samai",n:"Samai lamp",p:320,col:"#e0b050",d:"Tall temple lamp on a stem"},
+ {id:"silver",n:"Silver diya",p:420,col:"#d7dbe4",d:"Gleaming silver"},
+ {id:"akhand",n:"Akhand jyot",p:550,col:"#f0c040",d:"Grand golden lamp with a tall flame"}
+];
 var SHOP={
  clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,g:G.CLOTH[k].g,n:G.CLOTH[k].name,p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
- lamps:[{id:"clay",n:"Clay diya",p:40,col:"#b5562a",d:"Decorates one more house"},{id:"brass",n:"Brass diya",p:90,col:"#d9a441",d:"Bigger, golden glow"},{id:"kandil",n:"Akash kandil",p:120,col:"#ff6a3d",d:"Hanging star lantern"}],
- crackers:[{id:"rocket",n:"Rocket",p:30,col:"#ff3d81"},{id:"laxmi",n:"Laxmi bomb",p:50,col:"#c1121f"},{id:"shots",n:"Sky shots",p:40,col:"#8f5bff"},{id:"chakri",n:"Chakri",p:20,col:"#ff8a1f"},{id:"spark",n:"Phooljhari",p:15,col:"#fff2c9"}]
+ lamps:LAMPS,
+ crackers:CR
 };
 var cat="clothes";
 document.querySelectorAll("#shoptabs .tab").forEach(function(t){t.addEventListener("click",function(){
@@ -737,8 +896,8 @@ function buy(c,it){
   var s=st();if(s.coins<it.p){G.toast("Not enough coins yet. Finish a task!");return;}
   s.coins-=it.p;
   if(c==="clothes"){s.own.push(it.id);s.wear=it.id;}
-  else if(c==="lamps")s.lamps[it.id]++;
-  else s.inv[it.id]++;
+  else if(c==="lamps")s.lamps[it.id]=(s.lamps[it.id]||0)+1;
+  else s.inv[it.id]=(s.inv[it.id]||0)+1;
   SFX.coin();coinsUI();G.toast("Bought "+it.n);G.save();renderShop();renderCrackers();
 }
 function renderShop(){
@@ -752,18 +911,18 @@ function renderShop(){
       if(s.own.indexOf(it.id)>=0){b=el("button","btn",s.wear===it.id?"Wearing":"Wear");b.disabled=s.wear===it.id;b.addEventListener("click",function(){s.wear=it.id;G.save();renderShop();});}
       else{b=el("button","btn pri","Buy");b.disabled=s.coins<it.p;b.addEventListener("click",function(){buy(cat,it)});}
     }else{
-      card.appendChild(el("small","muted","You have "+(cat==="lamps"?s.lamps[it.id]:s.inv[it.id])));
+      card.appendChild(el("small","muted","You have "+((cat==="lamps"?s.lamps[it.id]:s.inv[it.id])||0)));
       b=el("button","btn pri","Buy 1");b.disabled=s.coins<it.p;b.addEventListener("click",function(){buy(cat,it)});
     }
     b.type="button";card.appendChild(b);g.appendChild(card);
   });
 }
-var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();};
+var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();renderCrackers();};
 
 
 /* ---------- chat rooms ---------- */
 var ROOMS=[{id:"chowk",n:"Rangoli Chowk",b:"Meet and greet"},{id:"mithai",n:"Mithai Mandap",b:"Sweets and gossip"},{id:"ghat",n:"Aarti Ghat",b:"Evening prayers"}];
-var cur=null,unsubs=[],botT=0,lastSend=0,CRN={rocket:"rocket",laxmi:"Laxmi bomb",shots:"sky shots",chakri:"chakri"};
+var cur=null,unsubs=[],botT=0,lastSend=0,CRN=(function(){var o={};CR.forEach(function(c){o[c.id]=c.n;});return o;})();
 nick="Guest"+(100+Math.floor(Math.random()*900));
 function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return "hsl("+h+",70%,72%)";}
 function addMsg(who,text,cls){
@@ -795,7 +954,7 @@ function onBurst(msg){
   if(msg.isMe)return;var d=msg.data||{};
   if(!CRN[d.k])return;
   var xf=(typeof d.x==="number"&&d.x>=0&&d.x<=1)?d.x:null;
-  G.FW[d.k](true,xf);sys((clean(d.n,14)||"Someone")+" lit a "+CRN[d.k]);
+  G.FW[d.k](true,xf);G.greet();sys((clean(d.n,14)||"Someone")+" lit a "+CRN[d.k]);
 }
 function onPeers(ch){var r=ROOMS.filter(function(x){return x.id===cur})[0];
   $("chatstat").textContent="Live in "+(r?r.n:"room")+" · "+ch.peers.length+" here now";}
@@ -914,8 +1073,15 @@ function setGender(g){var s=st();s.gender=g;var def=g==="f"?"anarkali":"kurta";
   updateGender();renderShop();G.save();G.toast(g==="f"?"Playing as the girl":"Playing as the boy");}
 $("gm").addEventListener("click",function(){setGender("m")});
 $("gf").addEventListener("click",function(){setGender("f")});
+/* ---------- keep older saves working ---------- */
+function ensureKeys(){
+  var s=st();s.inv=s.inv||{};s.lamps=s.lamps||{};s.own=s.own||["kurta"];
+  CR.forEach(function(c){if(typeof s.inv[c.id]!=="number")s.inv[c.id]=0;});
+  LAMPS.forEach(function(l){if(typeof s.lamps[l.id]!=="number")s.lamps[l.id]=0;});
+  if(!s.gender)s.gender="m";if(typeof s.stam!=="number")s.stam=100;
+}
 /* ---------- boot ---------- */
-function renderAll(){updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
+function renderAll(){ensureKeys();updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
 $("nick").value=nick;
 coinsUI();renderAll();
 G.toast("Press Start on task 1, then hold Walk ▶");
