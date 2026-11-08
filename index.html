@@ -47,6 +47,7 @@ canvas{display:block;width:100%;height:auto;aspect-ratio:20/11}
 .btn.pri{background:linear-gradient(180deg,var(--saffron),#e0680a);border-color:#ffb05a;color:#2b1200}
 .btn.pri:active,.btn.hold{filter:brightness(1.15);transform:translateY(1px)}
 .btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn[aria-pressed="true"]{border-color:var(--marigold);color:var(--marigold)}
 .tgl{display:inline-flex;align-items:center;gap:6px;color:var(--muted)}
 .prog{flex:1 1 220px;min-width:180px}
 .track{position:relative;height:12px;border-radius:99px;background:var(--night2);border:1px solid var(--line)}
@@ -131,6 +132,10 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     <button class="btn pri" id="walk" type="button">Walk ▶</button>
     <button class="btn" id="run" type="button">Run ⏩</button>
     <label class="tgl"><input type="checkbox" id="auto"> Keep walking</label>
+    <span class="tgl" role="group" aria-label="Choose character">Character
+      <button class="btn" id="gm" type="button" aria-pressed="true">Boy</button>
+      <button class="btn" id="gf" type="button" aria-pressed="false">Girl</button>
+    </span>
     <div class="prog">
       <div class="track"><div class="fill" id="fill"></div>
         <i class="mk" style="left:20%"></i><i class="mk" style="left:40%"></i><i class="mk" style="left:60%"></i><i class="mk" style="left:80%"></i>
@@ -207,7 +212,7 @@ var PXM=12, GOAL=2000, W=800, H=440, GY=372, AX=250;
 /* ---------- state ---------- */
 function fresh(){return {coins:50,dist:0,walked:0,gateDone:false,
   inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},
-  lamps:{clay:0,brass:0,kandil:0},own:['kurta'],wear:'kurta',blessed:{},
+  lamps:{clay:0,brass:0,kandil:0},own:['kurta'],wear:'kurta',gender:'m',blessed:{},
   bursts:0,diyas:0,ti:0,t0:null,base:{walked:0,bursts:0,diyas:0},res:[]};}
 var S=fresh(), KEY="deepotsav-gali-v1";
 try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&o.inv&&o.lamps){S=Object.assign(fresh(),o);}}}catch(e){}
@@ -405,10 +410,11 @@ var PXM=12,GOAL=2000,W=800,H=440,GY=372,AX=250;
 var cv=$("cv"),ctx=cv.getContext("2d");
 var V=G.cvParts;
 G.CLOTH={
-  kurta:{name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
-  saree:{name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
-  lehenga:{name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"},
-  sherwani:{name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"}
+  kurta:{g:"m",name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
+  sherwani:{g:"m",name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"},
+  anarkali:{g:"f",name:"Anarkali suit",price:0,top:"#8f3bd1",bot:"#f3e6c8",trim:"#ffd36a"},
+  saree:{g:"f",name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
+  lehenga:{g:"f",name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"}
 };
 function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
 /* sky */
@@ -512,20 +518,23 @@ function drawAvatar(){
   var c=G.CLOTH[G.S.wear]||G.CLOTH.kurta,sw=moving?Math.sin(phase)*.65:0,wear=G.S.wear;
   ctx.save();ctx.translate(AX,GY);
   ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,26,22,6,0,0,7);ctx.fill();
-  ctx.strokeStyle=(wear==="saree"||wear==="lehenga")?c.bot:"#f3e6c8";ctx.lineWidth=7;ctx.lineCap="round";
+  ctx.strokeStyle=(wear==="saree"||wear==="lehenga"||wear==="anarkali")?c.bot:"#f3e6c8";ctx.lineWidth=7;ctx.lineCap="round";
   ctx.beginPath();ctx.moveTo(-4,-8);ctx.lineTo(-4+Math.sin(sw)*18,22);ctx.moveTo(4,-8);ctx.lineTo(4-Math.sin(sw)*18,22);ctx.stroke();
   ctx.strokeStyle="#b97a55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-4+Math.sin(sw)*18,22);ctx.lineTo(-4+Math.sin(sw)*18+4,25);ctx.moveTo(4-Math.sin(sw)*18,22);ctx.lineTo(4-Math.sin(sw)*18+4,25);ctx.stroke();
   ctx.fillStyle=c.top;
   if(wear==="lehenga"){ctx.fillRect(-9,-44,18,18);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-26);ctx.lineTo(9,-26);ctx.lineTo(22,16);ctx.lineTo(-22,16);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-22,12,44,4);}
   else if(wear==="saree"){ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-46);ctx.lineTo(12,18);ctx.lineTo(-12,18);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-12,14,24,4);ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-14);ctx.lineTo(9,-8);ctx.lineTo(-9,-40);ctx.fill();}
+  else if(wear==="anarkali"){ctx.fillRect(-9,-46,18,26);ctx.beginPath();ctx.moveTo(-9,-22);ctx.lineTo(9,-22);ctx.lineTo(19,8);ctx.lineTo(-19,8);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-19,4,38,4);ctx.fillRect(-9,-24,18,3);ctx.fillStyle="#ff6aa8";ctx.beginPath();ctx.moveTo(-9,-44);ctx.lineTo(9,-44);ctx.lineTo(-2,6);ctx.lineTo(-9,6);ctx.fill();}
   else if(wear==="sherwani"){ctx.fillRect(-10,-46,20,64);ctx.fillStyle=c.trim;for(var b=0;b<5;b++)ctx.fillRect(-1,-40+b*10,3,3);ctx.fillRect(-10,14,20,4);}
   else{ctx.fillRect(-10,-46,20,52);ctx.fillStyle=c.trim;ctx.fillRect(-10,2,20,3);ctx.fillRect(-1,-46,2,16);}
   ctx.strokeStyle=c.top;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-9,-42);ctx.lineTo(-9-Math.sin(sw)*12,-14);ctx.stroke();
   ctx.beginPath();ctx.moveTo(9,-42);ctx.lineTo(9+Math.sin(sw)*12,-14);ctx.stroke();
+  var fem=(G.S.gender==="f");
+  if(fem){ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.ellipse(-7,-40,8,24,0,0,7);ctx.fill();ctx.fillStyle="#e8317a";ctx.fillRect(-12,-24,10,3);}
   ctx.fillStyle="#d9a07a";ctx.beginPath();ctx.arc(0,-56,10,0,7);ctx.fill();
   ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.arc(0,-59,10.5,Math.PI,0);ctx.fill();
-  if(wear==="saree"||wear==="lehenga"){ctx.fillRect(-11,-59,5,20);}
-  ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(4,-56,1.6,0,7);ctx.fill();
+  if(fem){ctx.fillRect(-11,-62,6,16);ctx.fillStyle="#d6243a";ctx.beginPath();ctx.arc(5,-60,1.7,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(1,-50,2,0,7);ctx.fill();ctx.fillStyle="#ffcf4a";ctx.fillRect(-7,-68,3,3);}
+  else{ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(4,-56,1.6,0,7);ctx.fill();}
   if(V.SP.length){ctx.strokeStyle="#d9d9d9";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(22,-34);ctx.lineTo(14,-22);ctx.stroke();glow(22,-34,22,"rgba(255,230,160,1)",.6);}
   ctx.restore();ctx.lineWidth=1;
 }
@@ -644,7 +653,7 @@ function liveTask(){
   var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
 $("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
-function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
+function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
 var acc=0,saveAcc=0;
 G.update=function(dt){
   var s=st();acc+=dt;saveAcc+=dt;
@@ -717,7 +726,7 @@ function doStep(s,i){
 
 /* ---------- shop ---------- */
 var SHOP={
- clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,n:G.CLOTH[k].name,p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
+ clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,g:G.CLOTH[k].g,n:G.CLOTH[k].name,p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
  lamps:[{id:"clay",n:"Clay diya",p:40,col:"#b5562a",d:"Decorates one more house"},{id:"brass",n:"Brass diya",p:90,col:"#d9a441",d:"Bigger, golden glow"},{id:"kandil",n:"Akash kandil",p:120,col:"#ff6a3d",d:"Hanging star lantern"}],
  crackers:[{id:"rocket",n:"Rocket",p:30,col:"#ff3d81"},{id:"laxmi",n:"Laxmi bomb",p:50,col:"#c1121f"},{id:"shots",n:"Sky shots",p:40,col:"#8f5bff"},{id:"chakri",n:"Chakri",p:20,col:"#ff8a1f"},{id:"spark",n:"Phooljhari",p:15,col:"#fff2c9"}]
 };
@@ -734,7 +743,7 @@ function buy(c,it){
 }
 function renderShop(){
   var g=$("shopgrid"),s=st();g.textContent="";
-  SHOP[cat].forEach(function(it){
+  SHOP[cat].filter(function(it){return cat!=="clothes"||it.g===(s.gender||"m");}).forEach(function(it){
     var card=el("div","card"),r=el("div","row"),sw=el("div","sw");sw.style.background=it.col2?"linear-gradient(180deg,"+it.col+" 50%,"+it.col2+" 50%)":it.col;
     r.appendChild(sw);var nm=el("div");nm.style.flex="1";nm.appendChild(el("b",null,it.n));if(it.d)nm.appendChild(el("small","muted",it.d)).style.display="block";r.appendChild(nm);
     r.appendChild(el("span","price",it.p?"🪙 "+it.p:"Free"));card.appendChild(r);
@@ -842,8 +851,16 @@ function renderSongs(){
 }
 $("vol").addEventListener("input",function(){G.music.vol(this.value/100);});
 
+/* ---------- character ---------- */
+function updateGender(){var g=st().gender||"m";$("gm").setAttribute("aria-pressed",g==="m"?"true":"false");$("gf").setAttribute("aria-pressed",g==="f"?"true":"false");}
+function setGender(g){var s=st();s.gender=g;var def=g==="f"?"anarkali":"kurta";
+  if(s.own.indexOf(def)<0)s.own.push(def);
+  if(!G.CLOTH[s.wear]||G.CLOTH[s.wear].g!==g)s.wear=def;
+  updateGender();renderShop();G.save();G.toast(g==="f"?"Playing as the girl":"Playing as the boy");}
+$("gm").addEventListener("click",function(){setGender("m")});
+$("gf").addEventListener("click",function(){setGender("f")});
 /* ---------- boot ---------- */
-function renderAll(){renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
+function renderAll(){updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
 $("nick").value=nick;
 coinsUI();renderAll();
 G.toast("Press Start on task 1, then hold Walk ▶");
