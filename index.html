@@ -168,6 +168,8 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     <button class="tab" role="tab" id="t-crackers" aria-selected="false" data-p="crackers">Crackers</button>
     <button class="tab" role="tab" id="t-mandir" aria-selected="false" data-p="mandir">Mandir</button>
     <button class="tab" role="tab" id="t-shop" aria-selected="false" data-p="shop">Shop</button>
+    <button class="tab" role="tab" id="t-mylamps" aria-selected="false" data-p="mylamps">My Lamps</button>
+    <button class="tab" role="tab" id="t-wardrobe" aria-selected="false" data-p="wardrobe">Wardrobe</button>
     <button class="tab" role="tab" id="t-chat" aria-selected="false" data-p="chat">Rooms</button>
     <button class="tab" role="tab" id="t-board" aria-selected="false" data-p="board">Leaderboard</button>
     <button class="tab" role="tab" id="t-songs" aria-selected="false" data-p="songs">Songs</button>
@@ -200,6 +202,16 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
       <button class="tab" aria-selected="false" data-c="crackers">Crackers</button>
     </div>
     <div class="grid" id="shopgrid"></div>
+  </section>
+
+  <section class="panel" id="p-mylamps" role="tabpanel" aria-labelledby="t-mylamps" hidden>
+    <div><h2>My lamps</h2><p class="muted">Lamps you buy in the Bazaar wait here. Light them to make them glow on the rooftops along the street, and put them out again whenever you like.</p><p class="muted" id="lampstat"></p></div>
+    <div class="grid" id="lampgrid"></div>
+  </section>
+
+  <section class="panel" id="p-wardrobe" role="tabpanel" aria-labelledby="t-wardrobe" hidden>
+    <div><h2>Wardrobe</h2><p class="muted">Every outfit you have bought is kept here. Wear any of them, or take it off to go back to plain clothes. Only the outfit you wear gives its speed bonus.</p><p class="muted" id="wardstat"></p></div>
+    <div class="grid" id="wardgrid"></div>
   </section>
 
   <section class="panel" id="p-chat" role="tabpanel" aria-labelledby="t-chat" hidden>
@@ -261,7 +273,7 @@ var PXM=12, GOAL=4000, W=800, H=440, GY=372, AX=250;
 /* ---------- state ---------- */
 function fresh(){return {coins:50,dist:0,walked:0,gateDone:false,
   inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},
-  lamps:{clay:0,brass:0,kandil:0},own:['kurta'],wear:'kurta',gender:'m',blessed:{},
+  lamps:{clay:0,brass:0,kandil:0},litl:null,own:['kurta'],wear:'kurta',gender:'m',blessed:{},
   bursts:0,diyas:0,ti:0,t0:null,base:{walked:0,bursts:0,diyas:0},res:[]};}
 var S=fresh(), KEY="deepotsav-gali-v1";
 try{var raw=localStorage.getItem(KEY);if(raw){var o=JSON.parse(raw);if(o&&o.inv&&o.lamps){S=Object.assign(fresh(),o);}}}catch(e){}
@@ -582,7 +594,7 @@ function diya(x,y,sc,kind){
     default:bowl("#b5562a");flame(0);
   }
 }
-function lampTypes(){var l=G.S.lamps||{},a=[],i,ids=["akhand","silver","samai","kandil","lotus","peacock","brass","wick2","painted","clay"];ids.forEach(function(id){for(i=0;i<(l[id]||0);i++)a.push(id);});return a;}
+function lampTypes(){var l=G.S.litl||{},a=[],i,ids=["akhand","silver","samai","kandil","lotus","peacock","brass","wick2","painted","clay"];ids.forEach(function(id){for(i=0;i<(l[id]||0);i++)a.push(id);});return a;}
 
 function drawSky(wp){
   ctx.fillStyle=sky;ctx.fillRect(0,0,W,350);
@@ -665,7 +677,7 @@ function rangoli(x,y,k){
   ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(0,0,6,0,7);ctx.fill();ctx.restore();
 }
 function drawAvatar(){
-  var c=G.CLOTH[G.S.wear]||G.CLOTH.kurta,sw=moving?Math.sin(phase)*.65:0,sh=c.shape,fem=(G.S.gender==="f"),b;
+  var c=G.CLOTH[G.S.wear]||{shape:"kurta",top:"#7d8594",bot:"#4d5366",trim:"#7d8594"},sw=moving?Math.sin(phase)*.65:0,sh=c.shape,fem=(G.S.gender==="f"),b;
   ctx.save();ctx.translate(AX,GY);
   ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,26,22,6,0,0,7);ctx.fill();
   if(fem){ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.ellipse(-7,-40,8,24,0,0,7);ctx.fill();ctx.fillStyle="#e8317a";ctx.fillRect(-12,-24,10,3);}
@@ -869,7 +881,7 @@ function liveTask(){
   var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
 $("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
-function freshState(){return {lit:[],coins:50,dist:0,walked:0,v:0,clock:0,started:false,over:false,saved:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0,tk:{},ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0},res:[]};}
+function freshState(){return {lit:[],coins:50,dist:0,walked:0,v:0,clock:0,started:false,over:false,saved:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},litl:{},own:["kurta"],wear:"kurta",gender:"m",stam:100,blessed:{},bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0,tk:{},ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0,ran:0,buys:0,chats:0},res:[]};}
 var acc=0,saveAcc=0;
 G.update=function(dt){
   var s=st();acc+=dt;saveAcc+=dt;
@@ -981,7 +993,7 @@ function buy(c,it){
   if(c==="clothes"){s.own.push(it.id);s.wear=it.id;}
   else if(c==="lamps")s.lamps[it.id]=(s.lamps[it.id]||0)+1;
   else s.inv[it.id]=(s.inv[it.id]||0)+1;
-  SFX.coin();coinsUI();G.toast("Bought "+it.n);G.save();renderShop();renderCrackers();
+  SFX.coin();coinsUI();G.toast(c==="lamps"?"Bought "+it.n+". Open My Lamps to light it!":c==="clothes"?"Bought "+it.n+". Now wearing it (see Wardrobe).":"Bought "+it.n);G.save();renderShop();renderCrackers();
 }
 function renderShop(){
   var g=$("shopgrid"),s=st();g.textContent="";
@@ -991,7 +1003,7 @@ function renderShop(){
     r.appendChild(el("span","price",it.p?"🪙 "+it.p:"Free"));card.appendChild(r);
     var b;
     if(cat==="clothes"){
-      if(s.own.indexOf(it.id)>=0){b=el("button","btn",s.wear===it.id?"Wearing":"Wear");b.disabled=s.wear===it.id;b.addEventListener("click",function(){s.wear=it.id;G.save();renderShop();});}
+      if(s.own.indexOf(it.id)>=0){b=el("button","btn",s.wear===it.id?"Wearing":"Wear");b.disabled=s.wear===it.id;b.addEventListener("click",function(){s.wear=it.id;G.save();renderShop();renderWardrobe();});}
       else{b=el("button","btn pri","Buy");b.disabled=s.coins<it.p;b.addEventListener("click",function(){buy(cat,it)});}
     }else{
       card.appendChild(el("small","muted","You have "+((cat==="lamps"?s.lamps[it.id]:s.inv[it.id])||0)));
@@ -1000,7 +1012,44 @@ function renderShop(){
     b.type="button";card.appendChild(b);g.appendChild(card);
   });
 }
-var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();renderCrackers();};
+
+/* ---------- my lamps: light and put out the lamps you own ---------- */
+function renderMyLamps(){
+  var g=$("lampgrid"),s=st();if(!g)return;g.textContent="";s.litl=s.litl||{};
+  var owned=LAMPS.filter(function(l){return (s.lamps[l.id]||0)>0;}),totalLit=0;
+  owned.forEach(function(l){totalLit+=Math.min(s.litl[l.id]||0,s.lamps[l.id]||0);});
+  $("lampstat").textContent=owned.length?totalLit+" lit on the street. Each lit lamp decorates a rooftop, starting with the first house.":"You have no lamps yet. Buy some in Bazaar, then Lamps.";
+  owned.forEach(function(l){
+    var have=s.lamps[l.id]||0,lit=Math.min(s.litl[l.id]||0,have);
+    var card=el("div","card"),r=el("div","row"),sw=el("div","sw");sw.style.background=l.col;r.appendChild(sw);
+    var nm=el("div");nm.style.flex="1";nm.appendChild(el("b",null,l.n));nm.appendChild(el("small","muted",l.d)).style.display="block";r.appendChild(nm);card.appendChild(r);
+    card.appendChild(el("small","muted","You have "+have+" · lit "+lit));
+    var bar=el("div");bar.style.cssText="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap";
+    var on=el("button","btn pri","🪔 Light");on.type="button";on.disabled=lit>=have;
+    on.addEventListener("click",function(){s.litl[l.id]=lit+1;G.ac();SFX.clink();G.toast(l.n+" lit!");G.save();renderMyLamps();});
+    var off=el("button","btn","Put out");off.type="button";off.disabled=lit<=0;
+    off.addEventListener("click",function(){s.litl[l.id]=lit-1;G.ac();G.toast(l.n+" put out");G.save();renderMyLamps();});
+    var all=el("button","btn","Light all");all.type="button";all.disabled=lit>=have;
+    all.addEventListener("click",function(){s.litl[l.id]=have;G.ac();SFX.clink();G.toast("All "+l.n+" lit!");G.save();renderMyLamps();});
+    bar.appendChild(on);bar.appendChild(off);if(have>1)bar.appendChild(all);card.appendChild(bar);g.appendChild(card);
+  });
+}
+/* ---------- wardrobe: wear or take off the outfits you own ---------- */
+function renderWardrobe(){
+  var g=$("wardgrid"),s=st();if(!g)return;g.textContent="";
+  var gd=s.gender||"m",cur=G.CLOTH[s.wear];
+  $("wardstat").textContent=cur?"Wearing: "+cur.name+" (speed +"+Math.round((cur.boost-1)*100)+"%)":"Wearing: plain clothes (no speed bonus)";
+  s.own.filter(function(id,i){return G.CLOTH[id]&&G.CLOTH[id].g===gd&&s.own.indexOf(id)===i;})
+   .sort(function(a,b){return G.CLOTH[a].price-G.CLOTH[b].price;}).forEach(function(id){
+    var c=G.CLOTH[id],card=el("div","card"),r=el("div","row"),sw=el("div","sw");
+    sw.style.background="linear-gradient(180deg,"+c.top+" 50%,"+c.bot+" 50%)";r.appendChild(sw);
+    var nm=el("div");nm.style.flex="1";nm.appendChild(el("b",null,c.name));nm.appendChild(el("small","muted","Speed +"+Math.round((c.boost-1)*100)+"%")).style.display="block";r.appendChild(nm);card.appendChild(r);
+    var worn=s.wear===id,b=el("button",worn?"btn":"btn pri",worn?"Take off":"Wear");b.type="button";
+    b.addEventListener("click",function(){s.wear=worn?"":id;G.ac();G.toast(worn?"Outfit taken off":"Now wearing "+c.name);G.save();renderWardrobe();renderShop();});
+    card.appendChild(b);g.appendChild(card);
+  });
+}
+var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();renderCrackers();renderMyLamps();renderWardrobe();};
 
 
 /* ---------- chat rooms ---------- */
@@ -1152,8 +1201,8 @@ $("vol").addEventListener("input",function(){G.music.vol(this.value/100);});
 function updateGender(){var g=st().gender||"m";$("gm").setAttribute("aria-pressed",g==="m"?"true":"false");$("gf").setAttribute("aria-pressed",g==="f"?"true":"false");}
 function setGender(g){var s=st();s.gender=g;var def=g==="f"?"anarkali":"kurta";
   if(s.own.indexOf(def)<0)s.own.push(def);
-  if(!G.CLOTH[s.wear]||G.CLOTH[s.wear].g!==g)s.wear=def;
-  updateGender();renderShop();G.save();G.toast(g==="f"?"Playing as the girl":"Playing as the boy");}
+  if(s.wear!==""&&(!G.CLOTH[s.wear]||G.CLOTH[s.wear].g!==g))s.wear=def;
+  updateGender();renderShop();renderWardrobe();G.save();G.toast(g==="f"?"Playing as the girl":"Playing as the boy");}
 $("gm").addEventListener("click",function(){setGender("m")});
 $("gf").addEventListener("click",function(){setGender("f")});
 /* ---------- leaderboard and game over ---------- */
@@ -1205,7 +1254,7 @@ function fillOver(){
 function showOver(){
   var s=st();if(!s.over)return;
   $("overtime").textContent=G.fmt(s.finish||s.clock||0);
-  var c=G.CLOTH[s.wear]||{name:"Cotton kurta"};
+  var c=G.CLOTH[s.wear]||{name:"Plain clothes"};
   $("overinfo").textContent="Outfit: "+c.name+" · "+s.coins+" coins left · "+s.ti+" of "+TASKS.length+" tasks done · "+s.bursts+" crackers burst";
   $("lbname").value=clean($("nick").value,14)||nick;
   $("lbmsg").textContent=s.saved?"Saved to the leaderboard.":"";
@@ -1244,13 +1293,14 @@ $("restart").addEventListener("click",function(){
 /* ---------- keep older saves working ---------- */
 function ensureKeys(){
   var s=st();s.inv=s.inv||{};s.lamps=s.lamps||{};s.own=s.own||["kurta"];
+  if(!s.litl){s.litl={};Object.keys(s.lamps).forEach(function(k){s.litl[k]=s.lamps[k]||0;});}
   CR.forEach(function(c){if(typeof s.inv[c.id]!=="number")s.inv[c.id]=0;});
   LAMPS.forEach(function(l){if(typeof s.lamps[l.id]!=="number")s.lamps[l.id]=0;});
   if(!s.gender)s.gender="m";if(typeof s.stam!=="number")s.stam=100;
   ["v","clock","ran","buys","chats"].forEach(function(k){if(typeof s[k]!=="number")s[k]=0;});s.tk=s.tk||{};s.base=s.base||{};
 }
 /* ---------- boot ---------- */
-function renderAll(){ensureKeys();updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
+function renderAll(){ensureKeys();updateGender();renderTasks();renderCrackers();renderMandir();renderShop();renderMyLamps();renderWardrobe();renderSongs();renderRooms();$("nick").value=nick;}
 $("nick").value=nick;
 coinsUI();renderAll();
 if(st().over)showOver();else G.toast("Tap Step fast to run! The clock starts on your first step.");
