@@ -230,7 +230,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
   </section>
 
   <section class="panel" id="p-board" role="tabpanel" aria-labelledby="t-board" hidden>
-    <div><h2>Leaderboard</h2><p class="muted">Fastest runs to the Mela gate at 4 km. The clock starts on your first step, keeps running while you do tasks or shop, and stops at the gate.</p></div>
+    <div><h2>Leaderboard</h2><p class="muted">Fastest runs to the Mela gate at 4 km. Every finished run is posted automatically, and each player keeps their last 3 runs (the 4th replaces the oldest). The clock starts on your first step, keeps running while you do tasks or shop, and stops at the gate.</p></div>
     <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(250px,1fr))">
       <div class="card"><h3>Everyone</h3><p class="muted" id="gstat">Open this tab to load the shared leaderboard.</p><ol class="lb" id="glist"></ol></div>
       <div class="card"><h3>This device</h3><ol class="lb" id="llist"></ol></div>
@@ -1249,12 +1249,16 @@ $("gf").addEventListener("click",function(){setGender("f")});
 var LBKEY="deepotsav-gali-lb-v1",CIDKEY="deepotsav-gali-cid",BESTKEY="deepotsav-gali-best",LBBASE="deepotsav-gali-darpan/v1/lb/";
 var gEntries={},gState="idle",gProm=null,gClient=null;
 function myCid(){try{var c=localStorage.getItem(CIDKEY);if(!c){c=Math.random().toString(36).slice(2,12);localStorage.setItem(CIDKEY,c);}return c;}catch(e){return window.__dgcid||(window.__dgcid=Math.random().toString(36).slice(2,12));}}
-function lbLocal(){try{var a=JSON.parse(localStorage.getItem(LBKEY)||"[]");return Array.isArray(a)?a.filter(function(x){return x&&typeof x.t==="number";}):[];}catch(e){return[];}}
-function lbPut(e){var a=lbLocal().filter(function(x){return !e.d||x.d!==e.d;});a.push(e);a.sort(function(x,y){return x.t-y.t;});a=a.slice(0,10);try{localStorage.setItem(LBKEY,JSON.stringify(a));}catch(x){}return a;}
+function lbLocal(){try{var a=JSON.parse(localStorage.getItem(LBKEY)||"[]");return Array.isArray(a)?a.filter(function(x){return x&&typeof x.t==="number";}).sort(function(x,y){return x.t-y.t;}):[];}catch(e){return[];}}
+/* each player keeps only their last 3 finished runs; the 4th replaces the oldest */
+var KEEP=3,SLOTKEY="deepotsav-gali-slot";
+function isMine(k){var m=LBBASE+myCid();return k===m||k.indexOf(m+"/")===0;}
+function nextSlot(){var n=0;try{n=parseInt(localStorage.getItem(SLOTKEY),10)||0;localStorage.setItem(SLOTKEY,String(n+1));}catch(e){n=(window.__dgslot=(window.__dgslot||0)+1)-1;}return n%KEEP;}
+function lbPut(e){var a=lbLocal().filter(function(x){return !e.d||x.d!==e.d;});a.push(e);a.sort(function(x,y){return (y.d||0)-(x.d||0);});a=a.slice(0,KEEP);try{localStorage.setItem(LBKEY,JSON.stringify(a));}catch(x){}return a;}
 function li(parent,n,t,c,me){var l=el("li",me?"me":null);l.appendChild(el("span","nm",(clean(n,14)||"Guest")+(c!=null?" · "+c+" coins":"")));l.appendChild(el("span","t",G.fmt(t)));parent.appendChild(l);}
 function renderBoard(){
   var g=$("glist"),l=$("llist");if(!g||!l)return;g.textContent="";l.textContent="";
-  var me=LBBASE+myCid(),arr=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:k===me};}).sort(function(a,b){return a.t-b.t;}).slice(0,20);
+  var arr=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:isMine(k)};}).sort(function(a,b){return a.t-b.t;}).slice(0,20);
   arr.forEach(function(e){li(g,e.n,e.t,e.c,e.me);});
   var loc=lbLocal(),ed=st().entryD;loc.forEach(function(e){li(l,e.n,e.t,e.c,!!ed&&e.d===ed);});
   if(!loc.length)l.appendChild(el("li","muted","No finished runs yet."));
@@ -1271,20 +1275,23 @@ async function gConnectInner(){
   gClient=client;gState="live";
   client.on("message",function(topic,payload){
     if(topic.indexOf(LBBASE)!==0)return;
+    if(!payload||payload.length===0){delete gEntries[topic];renderBoard();return;}
     var d;try{d=JSON.parse(payload.toString());}catch(e){return;}
     if(!d||typeof d.n!=="string"||typeof d.t!=="number"||!isFinite(d.t)||d.t<100||d.t>20000)return;
     var c=(typeof d.c==="number"&&isFinite(d.c)&&d.c>=0&&d.c<=999999)?Math.round(d.c):0;
     gEntries[topic]={n:clean(d.n,14),t:Math.round(d.t*10)/10,c:c};renderBoard();
   });
-  client.subscribe(LBBASE+"+");renderBoard();return client;
+  client.subscribe(LBBASE+"#");renderBoard();return client;
 }
 function gConnect(){if(!gProm){gProm=gConnectInner().then(function(c){if(!c)gProm=null;return c;});}return gProm;}
 function openBoard(){renderBoard();gConnect();}
-async function postGlobal(name,t,coins){
-  var best=Infinity;try{best=parseFloat(localStorage.getItem(BESTKEY))||Infinity;}catch(e){}
-  var useT=Math.min(best,t);try{localStorage.setItem(BESTKEY,String(useT));}catch(e){}
+async function postGlobal(name,t,coins,slot){
   var cl=await gConnect();if(!cl)return false;
-  try{cl.publish(LBBASE+myCid(),JSON.stringify({n:clean(name,14)||"Guest",t:Math.round(useT*10)/10,c:Math.round(coins),v:1}),{retain:true,qos:1});}catch(e){return false;}
+  try{
+    /* clear the old single-score entry from earlier versions, then write this run into its slot (0-2) */
+    cl.publish(LBBASE+myCid(),"",{retain:true,qos:1});
+    cl.publish(LBBASE+myCid()+"/"+slot,JSON.stringify({n:clean(name,14)||"Guest",t:Math.round(t*10)/10,c:Math.round(coins),v:2}),{retain:true,qos:1});
+  }catch(e){return false;}
   return true;
 }
 function fillOver(){
@@ -1292,10 +1299,10 @@ function fillOver(){
   var loc=lbLocal(),ed=s.entryD;
   loc.slice(0,5).forEach(function(e){li(ol,e.n,e.t,e.c,!!ed&&e.d===ed);});
   if(!loc.length)ol.appendChild(el("li","muted","No runs saved yet."));
-  var me=LBBASE+myCid(),all=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:k===me};}).sort(function(a,b){return a.t-b.t;});
+  var cur=s.slot!==undefined?LBBASE+myCid()+"/"+s.slot:"",all=Object.keys(gEntries).map(function(k){var e=gEntries[k];return {n:e.n,t:e.t,c:e.c,me:isMine(k),cur:k===cur};}).sort(function(a,b){return a.t-b.t;});
   all.slice(0,10).forEach(function(e){li(og,e.n,e.t,e.c,e.me);});
   if(!all.length)og.appendChild(el("li","muted",gState==="offline"?"Shared leaderboard not reachable.":"Loading the shared leaderboard…"));
-  var rk="",gi=-1;all.forEach(function(e,i){if(e.me)gi=i;});
+  var rk="",gi=-1;all.forEach(function(e,i){if(e.cur)gi=i;});
   if(gi>=0)rk="You are #"+(gi+1)+" of "+all.length+" on the shared leaderboard";
   else{var li2=-1;loc.forEach(function(e,i){if(ed&&e.d===ed)li2=i;});if(li2>=0)rk="You are #"+(li2+1)+" on this device";}
   $("lbrank").textContent=rk;
@@ -1312,10 +1319,11 @@ function showOver(){
 async function postRun(name){
   var s=st(),t=s.finish||s.clock||0;nick=name;$("nick").value=name;
   if(!s.entryD)s.entryD=Date.now();
+  if(s.slot===undefined)s.slot=nextSlot();
   lbPut({n:name,t:Math.round(t*10)/10,c:s.coins,d:s.entryD});s.saved=true;G.save();
   $("lbmsg").textContent="Time saved on this device. Posting to the shared leaderboard…";renderBoard();fillOver();
-  var ok=await postGlobal(name,t,s.coins);
-  $("lbmsg").textContent=ok?"Posted to the shared leaderboard automatically.":"Saved on this device. The shared leaderboard could not be reached.";
+  var ok=await postGlobal(name,t,s.coins,s.slot);
+  $("lbmsg").textContent=ok?"Posted to the shared leaderboard automatically. Only your last 3 runs are kept.":"Saved on this device. The shared leaderboard could not be reached.";
   renderBoard();fillOver();
 }
 function autoSave(){var s=st();if(!s.over||s.saved)return;postRun(clean($("nick").value,14)||nick||"Guest");}
