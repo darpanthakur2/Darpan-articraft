@@ -1,19 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}</style>
 <title>Deepotsav Gali</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Mukta:wght@400;600;700&display=swap">
 <style>
+/* Layout: one night street (canvas) on top, a tabbed festival kit below. Single dark look by choice. */
 :root{
   --night:#150b22; --night2:#21133a; --panel:#2a1a47; --line:#4a3470;
   --ink:#fbf0dc; --muted:#c3b3d6; --marigold:#ffc83d; --saffron:#ff8a1f;
   --rose:#e8317a; --peacock:#19b3a6; --good:#7ddc8a; --warn:#ff9d6b;
-  --display:"Yatra One","Mukta",Georgia,serif;
-  --body:"Mukta","Noto Sans Devanagari",system-ui,sans-serif;
+  --display:"Yatra One","Mukta",Georgia,serif; --body:"Mukta","Noto Sans Devanagari",system-ui,sans-serif;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
@@ -99,17 +101,13 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
 .bars{display:flex;align-items:flex-end;gap:2px;height:18px}
 .bars i{width:3px;background:var(--marigold);height:4px;border-radius:2px}
 .playing .bars i{animation:eq .7s ease-in-out infinite alternate}
-.playing .bars i:nth-child(2){animation-delay:.15s}
-.playing .bars i:nth-child(3){animation-delay:.3s}
-.playing .bars i:nth-child(4){animation-delay:.45s}
+.playing .bars i:nth-child(2){animation-delay:.15s}.playing .bars i:nth-child(3){animation-delay:.3s}.playing .bars i:nth-child(4){animation-delay:.45s}
 @keyframes eq{to{height:18px}}
 .end{display:none;text-align:center;border:1px solid var(--marigold);border-radius:14px;padding:16px;background:linear-gradient(180deg,#3b1d52,var(--panel))}
 .end.on{display:block}
 @media (max-width:640px){.chat{grid-template-columns:1fr}.rooms{flex-direction:row;flex-wrap:wrap}.task{grid-template-columns:30px 1fr}.task .btn{grid-column:1/-1}}
 @media (prefers-reduced-motion:reduce){.playing .bars i{animation:none}}
 </style>
-</head>
-<body>
 <div class="wrap">
   <header class="top">
     <div>
@@ -123,10 +121,12 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
       <span class="chip">⏱ <b id="timer">--</b></span>
     </div>
   </header>
+
   <div class="scene">
-    <canvas id="cv" width="1200" height="660" aria-label="Diwali street game scene"></canvas>
+    <canvas id="cv" width="1200" height="660" aria-label="Night street decorated for Diwali with lamps, rangoli and fireworks"></canvas>
     <div class="toast" id="toast" role="status"></div>
   </div>
+
   <div class="walkbar">
     <button class="btn pri" id="walk" type="button">Walk ▶</button>
     <button class="btn" id="run" type="button">Run ⏩</button>
@@ -138,6 +138,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
       <div class="marks"><span>Start</span><span>500 m</span><span>1 km</span><span>1.5 km</span><span>Mela gate 2 km</span></div>
     </div>
   </div>
+
   <div class="tabs" role="tablist" aria-label="Festival menu">
     <button class="tab" role="tab" id="t-tasks" aria-selected="true" data-p="tasks">Tasks</button>
     <button class="tab" role="tab" id="t-crackers" aria-selected="false" data-p="crackers">Crackers</button>
@@ -146,22 +147,26 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     <button class="tab" role="tab" id="t-chat" aria-selected="false" data-p="chat">Rooms</button>
     <button class="tab" role="tab" id="t-songs" aria-selected="false" data-p="songs">Songs</button>
   </div>
+
   <section class="panel" id="p-tasks" role="tabpanel" aria-labelledby="t-tasks">
     <div>
       <h2>Five festival tasks</h2>
-      <p class="muted">Complete festival tasks to earn coins, unlock items and reach the mela gate.</p>
+      <p class="muted">Each task has a target time. Finish at half the target or faster for double coins; the reward shrinks the longer you take, down to a quarter. Blessings from the Mandir add 10% each.</p>
     </div>
     <div id="tasklist" style="display:flex;flex-direction:column;gap:8px"></div>
     <div class="end" id="end"><h2>Shubh Deepawali!</h2><p id="endtxt" class="muted"></p><p style="margin-top:10px"><button class="btn pri" id="again" type="button">Play again</button></p></div>
   </section>
+
   <section class="panel" id="p-crackers" role="tabpanel" aria-labelledby="t-crackers" hidden>
-    <div><h2>Crackers</h2><p class="muted">Keys 1 to 5 burst them too. Buy more in the Shop.</p></div>
+    <div><h2>Crackers</h2><p class="muted">Keys 1 to 5 burst them too. Buy more in the Shop. Rooms friends see your rockets in their sky.</p></div>
     <div class="grid" id="crgrid"></div>
   </section>
+
   <section class="panel" id="p-mandir" role="tabpanel" aria-labelledby="t-mandir" hidden>
-    <div><h2>Mandir</h2><p class="muted">Offer a flower, light the diya and ring the bell at each shrine to receive blessings.</p></div>
+    <div><h2>Mandir</h2><p class="muted">Offer a flower, light the diya and ring the bell at each shrine to receive a blessing: +10% coins on every task.</p></div>
     <div class="shrines" id="shrines"></div>
   </section>
+
   <section class="panel" id="p-shop" role="tabpanel" aria-labelledby="t-shop" hidden>
     <div><h2>Bazaar</h2><p class="muted">Spend the coins you earn from tasks.</p></div>
     <div class="tabs" id="shoptabs">
@@ -171,6 +176,7 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
     </div>
     <div class="grid" id="shopgrid"></div>
   </section>
+
   <section class="panel" id="p-chat" role="tabpanel" aria-labelledby="t-chat" hidden>
     <div><h2>Festival rooms</h2><p class="muted" id="chatstat">Pick a room to join.</p></div>
     <div class="chat">
@@ -185,8 +191,9 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
       </div>
     </div>
   </section>
+
   <section class="panel" id="p-songs" role="tabpanel" aria-labelledby="t-songs" hidden>
-    <div><h2>Diwali tunes</h2><p class="muted">Play instrumental festival music while you walk.</p></div>
+    <div><h2>Diwali tunes</h2><p class="muted">Instrumental festival music made inside the page, in ragas used for evening aarti. Tap a tune to play it while you walk.</p></div>
     <div class="songs" id="songs"></div>
     <div class="walkbar"><label class="tgl">Volume <input type="range" id="vol" min="0" max="100" value="60" aria-label="Music volume"></label></div>
   </section>
@@ -196,6 +203,8 @@ input[type=text]{flex:1;min-width:0;background:var(--night);border:1px solid var
 "use strict";
 var $=function(id){return document.getElementById(id)};
 var PXM=12, GOAL=2000, W=800, H=440, GY=372, AX=250;
+
+/* ---------- state ---------- */
 function fresh(){return {coins:50,dist:0,walked:0,gateDone:false,
   inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},
   lamps:{clay:0,brass:0,kandil:0},own:['kurta'],wear:'kurta',blessed:{},
@@ -207,865 +216,640 @@ function save(){clearTimeout(saveT);saveT=setTimeout(function(){try{localStorage
 var G={S:S,save:save,$:$};
 function setS(n){S=n;G.S=n;}
 G.setS=setS;
+
+/* ---------- toast ---------- */
 var toastT=0;
 function toast(t){var el=$("toast");el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(function(){el.classList.remove("on")},2600);}
 G.toast=toast;
-  /* ---------- AUDIO ---------- */
-var AC=null, master=null, musicGain=null;
 
-function audio(){
-  if(AC){
-    if(AC.state==="suspended") AC.resume();
-    return AC;
-  }
-  var Audio=window.AudioContext||window.webkitAudioContext;
-  if(!Audio) return null;
-  AC=new Audio();
-  master=AC.createGain();
-  master.gain.value=.7;
-  master.connect(AC.destination);
-  musicGain=AC.createGain();
-  musicGain.gain.value=.35;
-  musicGain.connect(master);
+/* ---------- audio ---------- */
+var AC=null,master=null,sfxG=null,musG=null,nbuf=null;
+function ac(){
+  if(AC){if(AC.state==="suspended")AC.resume();return AC;}
+  var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;
+  AC=new C();master=AC.createGain();master.gain.value=.9;master.connect(AC.destination);
+  sfxG=AC.createGain();sfxG.gain.value=.8;sfxG.connect(master);
+  musG=AC.createGain();musG.gain.value=.6*.5;musG.connect(master);
+  nbuf=AC.createBuffer(1,AC.sampleRate,AC.sampleRate);var d=nbuf.getChannelData(0);for(var i=0;i<d.length;i++)d[i]=Math.random()*2-1;
   return AC;
 }
-
-function beep(freq,duration,type){
-  if(!audio()) return;
-  var osc=AC.createOscillator();
-  var gain=AC.createGain();
-  osc.type=type||"sine";
-  osc.frequency.value=freq;
-  gain.gain.setValueAtTime(.15,AC.currentTime);
-  gain.gain.exponentialRampToValueAtTime(.001,AC.currentTime+duration);
-  osc.connect(gain);
-  gain.connect(master);
-  osc.start();
-  osc.stop(AC.currentTime+duration);
+G.ac=ac;
+function noise(t,dur,f0,f1,vol,type){
+  var s=AC.createBufferSource();s.buffer=nbuf;s.loop=true;
+  var f=AC.createBiquadFilter();f.type=type||"lowpass";f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(Math.max(40,f1),t+dur);
+  var g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  s.connect(f);f.connect(g);g.connect(sfxG);s.start(t);s.stop(t+dur+.05);
 }
-
-/* ---------- GAME CANVAS ---------- */
-var cv=$("cv");
-var ctx=cv.getContext("2d");
-var W=800,H=440;
-var distance=0;
-var speed=0;
-var particles=[];
-var fireworks=[];
-var lastFrame=0;
-var gameStarted=false;
-var walking=false;
-var running=false;
-
-function resizeCanvas(){
-  var ratio=window.devicePixelRatio||1;
-  var width=cv.clientWidth||800;
-  cv.width=width*ratio;
-  cv.height=width*11/20*ratio;
-  ctx.setTransform(cv.width/800,0,0,cv.height/440,0,0);
+function tone(t,dur,f0,f1,vol,type,dest){
+  var o=AC.createOscillator();o.type=type||"sine";o.frequency.setValueAtTime(f0,t);
+  if(f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  var g=AC.createGain();g.gain.setValueAtTime(vol,t);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(g);g.connect(dest||sfxG);o.start(t);o.stop(t+dur+.05);
 }
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
+var SFX={
+  boom:function(sz){if(!ac())return;var t=AC.currentTime;noise(t,.5+.5*sz,2400,160,.9*Math.min(1,.5+sz*.4));tone(t,.45,110,38,.9*Math.min(1,.5+sz*.4));},
+  pop:function(){if(!ac())return;var t=AC.currentTime;noise(t,.18,3000,400,.5);tone(t,.12,240,90,.35);},
+  whistle:function(d){if(!ac())return;var t=AC.currentTime;tone(t,d,500,2400,.12,"sine");},
+  crackle:function(n){if(!ac())return;var t=AC.currentTime;for(var i=0;i<n;i++)noise(t+Math.random()*1.2,.05,5000,1500,.3,"highpass");},
+  bell:function(){if(!ac())return;var t=AC.currentTime;[880,1320,1760,2210].forEach(function(f,i){tone(t,1.6-i*.2,f,f*.995,.12/(i+1),"sine");});},
+  clink:function(){if(!ac())return;var t=AC.currentTime;tone(t,.25,1568,1500,.12,"triangle");tone(t+.07,.3,2093,2000,.1,"triangle");},
+  coin:function(){if(!ac())return;var t=AC.currentTime;tone(t,.12,988,988,.12,"square");tone(t+.09,.3,1319,1319,.12,"square");},
+  fizz:function(){if(!ac())return;var t=AC.currentTime;noise(t,.4,6000,2500,.12,"highpass");}
+};
+G.SFX=SFX;
 
-/* ---------- BACKGROUND ---------- */
-function drawBackground(){
-  var sky=ctx.createLinearGradient(0,0,0,440);
-  sky.addColorStop(0,"#080414");
-  sky.addColorStop(.55,"#32174b");
-  sky.addColorStop(1,"#a34450");
-  ctx.fillStyle=sky;
-  ctx.fillRect(0,0,800,440);
-
-  // Stars
-  for(var i=0;i<65;i++){
-    var x=(i*127+distance*.03)%800;
-    var y=(i*71)%220;
-    ctx.fillStyle="rgba(255,255,220,.8)";
-    ctx.beginPath();
-    ctx.arc(x,y,1+(i%3)*.4,0,Math.PI*2);
-    ctx.fill();
+/* ---------- music ---------- */
+var SONGS=[
+ {id:"aarti",name:"Deep Aarti",desc:"Slow evening raga, bells and drone",bpm:70,root:196,scale:[0,1,3,5,7,8,10],
+  mel:[[4,1],[3,.5],[2,.5],[3,1],[2,.5],[1,.5],[2,1],[1,1],[0,2],[0,1],[1,1],[2,1.5],[3,.5],[4,1],[5,.5],[4,.5],[3,1],[2,1],[1,1],[0,2]],tab:[1,0,0,0,.4,0,.6,0]},
+ {id:"phool",name:"Phooljhari Dhun",desc:"Bright and bouncy, for sparkler time",bpm:126,root:220,scale:[0,2,4,6,7,9,11],
+  mel:[[0,.5],[2,.5],[4,.5],[2,.5],[5,.5],[4,.5],[2,.5],[0,.5],[1,.5],[3,.5],[5,.5],[3,.5],[6,.5],[5,.5],[4,.5],[2,.5],[4,.5],[5,.5],[6,.5],[7,.5],[8,1],[6,.5],[4,.5],[2,1],[0,1]],tab:[1,.3,.5,.3,.8,.3,.5,.5]},
+ {id:"laxmi",name:"Laxmi Pooja Taal",desc:"Steady dholak groove for the pooja hour",bpm:96,root:196,scale:[0,2,4,5,7,9,10],
+  mel:[[2,1],[4,.5],[5,.5],[4,1],[2,1],[0,1],[2,.5],[4,.5],[5,1],[7,1],[5,1],[4,2],[5,.5],[4,.5],[2,1],[0,1],[2,1],[0,2]],tab:[1,0,.4,0,.7,0,.4,.4]}
+];
+var mus={on:null,timer:0,nextN:0,mi:0,nextB:0,bc:0,drone:[],vol:.6};
+function pluck(t,f,dur){
+  var o=AC.createOscillator(),o2=AC.createOscillator(),lp=AC.createBiquadFilter(),g=AC.createGain();
+  o.type="sawtooth";o2.type="triangle";o.frequency.value=f;o2.frequency.value=f*1.003;
+  lp.type="lowpass";lp.frequency.setValueAtTime(3200,t);lp.frequency.exponentialRampToValueAtTime(500,t+dur);
+  g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(.22,t+.01);g.gain.exponentialRampToValueAtTime(.001,t+dur);
+  o.connect(lp);o2.connect(lp);lp.connect(g);g.connect(musG);o.start(t);o2.start(t);o.stop(t+dur+.05);o2.stop(t+dur+.05);
+}
+function drum(t,v,hi){
+  if(hi){noise(t,.06,hi?4500:900,1800,.12*v,"highpass");return;}
+  var o=AC.createOscillator(),g=AC.createGain();o.type="sine";o.frequency.setValueAtTime(150,t);o.frequency.exponentialRampToValueAtTime(62,t+.18);
+  g.gain.setValueAtTime(.45*v,t);g.gain.exponentialRampToValueAtTime(.001,t+.3);o.connect(g);g.connect(musG);o.start(t);o.stop(t+.35);
+}
+function stopDrone(){mus.drone.forEach(function(o){try{o.stop()}catch(e){}});mus.drone=[];}
+function startDrone(s){
+  stopDrone();var t=AC.currentTime;
+  [s.root/2,s.root*0.75].forEach(function(f){var o=AC.createOscillator(),g=AC.createGain();o.type="triangle";o.frequency.value=f;g.gain.value=.07;o.connect(g);g.connect(musG);o.start(t);mus.drone.push(o);});
+}
+function tick(){
+  var s=mus.on;if(!s||!AC)return;
+  var bd=60/s.bpm,now=AC.currentTime;
+  while(mus.nextN<now+.35){
+    var n=s.mel[mus.mi%s.mel.length],deg=n[0],b=n[1],oct=Math.floor(deg/7),idx=deg%7;
+    var f=s.root*2*Math.pow(2,(s.scale[idx]+12*oct)/12);
+    pluck(mus.nextN,f,Math.max(.4,b*bd*1.8));
+    mus.nextN+=b*bd;mus.mi++;
   }
+  while(mus.nextB<now+.35){
+    var p=s.tab[mus.bc%s.tab.length];
+    if(p>0){drum(mus.nextB,p,false);}
+    if(mus.bc%2===1)drum(mus.nextB,.6,true);
+    mus.nextB+=bd/2;mus.bc++;
+  }
+}
+G.music={
+  songs:SONGS,
+  play:function(id){
+    if(!ac())return;
+    var s=SONGS.filter(function(x){return x.id===id})[0];if(!s)return;
+    clearInterval(mus.timer);mus.on=s;mus.mi=0;mus.bc=0;mus.nextN=AC.currentTime+.1;mus.nextB=mus.nextN;
+    startDrone(s);mus.timer=setInterval(tick,90);tick();
+  },
+  stop:function(){clearInterval(mus.timer);mus.on=null;stopDrone();},
+  cur:function(){return mus.on?mus.on.id:null;},
+  vol:function(v){mus.vol=v;ac();musG.gain.value=v*.5;}
+};
 
-  // Moon
-  ctx.fillStyle="#ffe8a3";
-  ctx.beginPath();
-  ctx.arc(680,75,29,0,Math.PI*2);
-  ctx.fill();
-
-  // Buildings
-  for(var b=0;b<8;b++){
-    var x=b*115-(distance*.12%115);
-    var height=100+(b*37%100);
-    ctx.fillStyle=["#4d2454","#642b54","#3b285d"][b%3];
-    ctx.fillRect(x,250-height,95,height);
-
-    for(var wy=0;wy<4;wy++){
-      for(var wx=0;wx<3;wx++){
-        ctx.fillStyle=(wx+wy+b)%3===0?"#ffd36a":"#e89a48";
-        ctx.fillRect(x+12+wx*25,270-height+wy*30,10,15);
+/* ---------- fireworks ---------- */
+var P=[],R=[],GB=[],CH=[],SP=[],flash=0,shake=0;
+var COLS=["#ffcf4a","#ff6a3d","#ff3d81","#8f5bff","#2fd7c4","#7dff6a","#4aa8ff","#fff2c9"];
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function spawn(x,y,vx,vy,life,col,size,g,drag){P.push({x:x,y:y,vx:vx,vy:vy,l:life,m:life,c:col,s:size||2,g:g==null?60:g,d:drag==null?.985:drag});}
+function burst(x,y,col,kind){
+  var n=kind==="ring"?46:kind==="willow"?60:70,sp=kind==="willow"?110:150,c2=pick(COLS);
+  for(var i=0;i<n;i++){
+    var a=kind==="ring"?i/n*Math.PI*2:Math.random()*Math.PI*2;
+    var v=kind==="ring"?sp:sp*(.3+Math.random()*.8);
+    spawn(x,y,Math.cos(a)*v,Math.sin(a)*v,kind==="willow"?2.2:1.3+Math.random()*.5,i%5===0?c2:col,kind==="willow"?1.6:2.2,kind==="willow"?70:50,kind==="willow"?.97:.975);
+  }
+  flash=Math.max(flash,.18);
+}
+function launch(x,col,kind,cb){
+  var ty=60+Math.random()*110;
+  R.push({x:x,y:GY+26,vx:(Math.random()-.5)*14,vy:-(300+Math.random()*60),ty:ty,c:col,k:kind});
+  SFX.whistle(.7);
+}
+var FW={
+  rocket:function(remote,xf){
+    var x=xf!=null?xf*W:120+Math.random()*560;launch(x,pick(COLS),pick(["peony","ring","willow"]));
+  },
+  laxmi:function(remote,xf){
+    var x=xf!=null?xf*W:AX+110;GB.push({x:x,t:0,fuse:1.1,boomed:false});SFX.fizz();
+  },
+  shots:function(remote,xf){
+    var base=xf!=null?xf*W:200+Math.random()*400;
+    for(var i=0;i<5;i++)(function(i){setTimeout(function(){
+      var x=base+(i-2)*70,col=COLS[(i*2)%COLS.length];
+      R.push({x:x,y:GY+26,vx:0,vy:-(380+Math.random()*50),ty:90+Math.random()*70,c:col,k:"peony",fast:true});SFX.pop();
+    },i*230);})(i);
+  },
+  chakri:function(remote,xf){
+    var x=xf!=null?xf*W:AX+100;CH.push({x:x,t:0,r:0});SFX.fizz();
+  },
+  spark:function(){SP.push({t:0});SFX.fizz();}
+};
+G.FW=FW;
+function stepFW(dt){
+  for(var i=R.length-1;i>=0;i--){
+    var r=R[i];r.x+=r.vx*dt;r.y+=r.vy*dt;r.vy+=(r.fast?260:210)*dt;
+    spawn(r.x,r.y,(Math.random()-.5)*20,20+Math.random()*30,.45,"#ffb347",1.4,0,.96);
+    if(r.vy>-60||r.y<=r.ty){
+      burst(r.x,r.y,r.c,r.k);SFX.boom(.35);if(Math.random()<.5)SFX.crackle(6);R.splice(i,1);
+    }
+  }
+  for(var j=GB.length-1;j>=0;j--){
+    var b=GB[j];b.t+=dt;
+    if(!b.boomed){
+      spawn(b.x+6,392-8,(Math.random()-.5)*40,-40-Math.random()*40,.35,"#ffd36a",1.6,0,.9);
+      if(b.t>=b.fuse){
+        b.boomed=true;b.t=0;flash=.7;shake=14;SFX.boom(1.6);
+        for(var k=0;k<90;k++){var a=Math.random()*Math.PI*2,v=60+Math.random()*260;spawn(b.x,392,Math.cos(a)*v,Math.sin(a)*v*.7-80,.9+Math.random()*.6,k%3?"#ff3b3b":"#ffcf4a",2.6,300,.95);}
       }
-    }
+    }else if(b.t>.6){GB.splice(j,1);}
   }
-
-  // Road
-  ctx.fillStyle="#24172e";
-  ctx.fillRect(0,350,800,90);
-
-  ctx.fillStyle="#59405c";
-  ctx.fillRect(0,350,800,5);
-
-  // Road decorations
-  for(var d=0;d<10;d++){
-    var dx=(d*100-distance*.7%100+800)%800;
-    ctx.fillStyle="#ffc83d";
-    ctx.beginPath();
-    ctx.arc(dx,395,3,0,Math.PI*2);
-    ctx.fill();
+  for(var c=CH.length-1;c>=0;c--){
+    var ch=CH[c];ch.t+=dt;ch.r+=dt*26;
+    for(var q=0;q<3;q++)spawn(ch.x+Math.cos(ch.r)*8,396+Math.sin(ch.r)*3,Math.cos(ch.r+1.5)*140+(Math.random()-.5)*30,-30-Math.random()*70,.5,pick(["#ffd36a","#ff8a1f","#fff2c9"]),1.6,160,.94);
+    if(ch.t>3.2)CH.splice(c,1);
   }
-}
-
-/* ---------- DIYAS ---------- */
-function drawDiya(x,y){
-  ctx.fillStyle="#c56b26";
-  ctx.beginPath();
-  ctx.ellipse(x,y,12,6,0,0,Math.PI*2);
-  ctx.fill();
-
-  var flame=4+Math.sin(Date.now()/130+x)*2;
-  ctx.fillStyle="#ff9e22";
-  ctx.beginPath();
-  ctx.ellipse(x,y-9,4,flame,0,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle="#fff5b0";
-  ctx.beginPath();
-  ctx.arc(x,y-10,2,0,Math.PI*2);
-  ctx.fill();
-}
-
-/* ---------- PLAYER ---------- */
-function drawPlayer(){
-  var x=250;
-  var y=326+Math.sin(Date.now()/130)*2;
-
-  ctx.fillStyle="#e9ad79";
-  ctx.beginPath();
-  ctx.arc(x,y-36,12,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle="#24122c";
-  ctx.beginPath();
-  ctx.arc(x,y-41,13,Math.PI,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle=S.wear==="kurta"?"#e8a33d":
-    S.wear==="saree"?"#d6246e":
-    S.wear==="lehenga"?"#19b3a6":"#7b1530";
-
-  ctx.fillRect(x-11,y-24,22,32);
-
-  ctx.strokeStyle="#e9ad79";
-  ctx.lineWidth=5;
-  ctx.beginPath();
-  ctx.moveTo(x-8,y-18);
-  ctx.lineTo(x-19,y-5);
-  ctx.moveTo(x+8,y-18);
-  ctx.lineTo(x+19,y-5);
-  ctx.stroke();
-
-  ctx.strokeStyle="#211329";
-  ctx.lineWidth=6;
-  ctx.beginPath();
-  ctx.moveTo(x-5,y+8);
-  ctx.lineTo(x-9,y+23);
-  ctx.moveTo(x+5,y+8);
-  ctx.lineTo(x+9,y+23);
-  ctx.stroke();
-}
-
-/* ---------- RANGOLI ---------- */
-function drawRangoli(x,y){
-  var colors=["#ffcf4a","#ff3981","#25c9b7","#ffffff"];
-  for(var i=0;i<4;i++){
-    ctx.fillStyle=colors[i];
-    ctx.beginPath();
-    ctx.ellipse(x,y,23-i*4,10-i*2,i*Math.PI/4,0,Math.PI*2);
-    ctx.fill();
+  for(var s=SP.length-1;s>=0;s--){
+    var sp=SP[s];sp.t+=dt;
+    for(var z=0;z<5;z++){var a2=Math.random()*Math.PI*2,v2=40+Math.random()*90;spawn(AX+22,GY-34,Math.cos(a2)*v2,Math.sin(a2)*v2-20,.5+Math.random()*.3,pick(["#fff2c9","#ffd36a","#ffffff"]),1.5,120,.93);}
+    if(sp.t>4.5)SP.splice(s,1);
   }
-  ctx.fillStyle="#fff1a8";
-  ctx.beginPath();
-  ctx.arc(x,y,4,0,Math.PI*2);
-  ctx.fill();
-}
-
-/* ---------- FIREWORKS ---------- */
-function burst(x,y,color){
-  for(var i=0;i<45;i++){
-    var angle=Math.random()*Math.PI*2;
-    var velocity=1+Math.random()*4;
-    particles.push({
-      x:x,y:y,
-      vx:Math.cos(angle)*velocity,
-      vy:Math.sin(angle)*velocity,
-      life:50+Math.random()*30,
-      color:color
-    });
+  for(var p=P.length-1;p>=0;p--){
+    var q2=P[p];q2.l-=dt;if(q2.l<=0){P.splice(p,1);continue;}
+    q2.vx*=q2.d;q2.vy=q2.vy*q2.d+q2.g*dt;q2.x+=q2.vx*dt;q2.y+=q2.vy*dt;
   }
+  if(P.length>2400)P.splice(0,P.length-2400);
+  flash=Math.max(0,flash-dt*1.6);shake=Math.max(0,shake-dt*30);
 }
+G.fwCount=function(){return R.length+GB.length+CH.length};
+G.cvParts={P:P,R:R,GB:GB,CH:CH,SP:SP,COLS:COLS};
+G.stepFW=stepFW;
+G.getFlash=function(){return flash};
+G.getShake=function(){return shake};
+G.burst=burst;
+window.__G=G;
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var G=window.__G,$=G.$;
+var PXM=12,GOAL=2000,W=800,H=440,GY=372,AX=250;
+var cv=$("cv"),ctx=cv.getContext("2d");
+var V=G.cvParts;
+G.CLOTH={
+  kurta:{name:"Cotton kurta",price:0,top:"#e8a33d",bot:"#f3e6c8",trim:"#fff2c9"},
+  saree:{name:"Silk saree",price:250,top:"#d6246e",bot:"#d6246e",trim:"#ffd36a"},
+  lehenga:{name:"Lehenga choli",price:400,top:"#19b3a6",bot:"#7a3bd1",trim:"#ffd36a"},
+  sherwani:{name:"Sherwani",price:350,top:"#7b1530",bot:"#f3e6c8",trim:"#ffcf4a"}
+};
+function rnd(i,s){var x=Math.sin(i*127.1+s*311.7)*43758.5453;return x-Math.floor(x);}
+/* sky */
+var sky=ctx.createLinearGradient(0,0,0,340);
+sky.addColorStop(0,"#07030f");sky.addColorStop(.55,"#251042");sky.addColorStop(1,"#6a2a62");
+var stars=[];for(var i=0;i<90;i++)stars.push({x:rnd(i,1)*W,y:rnd(i,2)*230,r:.4+rnd(i,3)*1.1,p:rnd(i,4)*6});
+var WALLS=["#e0912c","#c4285f","#14948a","#6c3ec0","#d96a2a","#b0306f"];
+var tt=0,phase=0,moving=false,walkHeld=false,runHeld=false,keyW=false,keyR=false;
 
-function launchFirework(){
-  var colors=["#ffc83d","#ff3d81","#19b3a6","#ffffff","#ff8a1f"];
-  var x=80+Math.random()*640;
-  var y=60+Math.random()*150;
-  burst(x,y,colors[Math.floor(Math.random()*colors.length)]);
+function glow(x,y,r,col,a){
+  var g=ctx.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,col);g.addColorStop(1,"rgba(255,160,40,0)");
+  ctx.globalAlpha=a;ctx.fillStyle=g;ctx.fillRect(x-r,y-r,r*2,r*2);ctx.globalAlpha=1;
 }
+function diya(x,y,sc,kind){
+  var col=kind==="brass"?"#d9a441":kind==="kandil"?"#ff6a3d":"#b5562a";
+  ctx.fillStyle=col;ctx.beginPath();ctx.ellipse(x,y,7*sc,3.4*sc,0,0,Math.PI);ctx.fill();
+  ctx.fillStyle="#ffb347";var f=1+Math.sin(tt*9+x*.7)*.18;
+  ctx.beginPath();ctx.ellipse(x,y-4*sc*f,2*sc,4.6*sc*f,0,0,Math.PI*2);ctx.fill();
+  ctx.fillStyle="#fff3c4";ctx.beginPath();ctx.ellipse(x,y-3*sc,.9*sc,2.2*sc,0,0,Math.PI*2);ctx.fill();
+}
+function lampTypes(){var l=G.S.lamps,a=[],i;for(i=0;i<l.kandil;i++)a.push("kandil");for(i=0;i<l.brass;i++)a.push("brass");for(i=0;i<l.clay;i++)a.push("clay");return a;}
 
-function drawParticles(){
-  for(var i=particles.length-1;i>=0;i--){
-    var p=particles[i];
-    p.x+=p.vx;
-    p.y+=p.vy;
-    p.vy+=.035;
-    p.life--;
-
-    ctx.globalAlpha=Math.max(0,p.life/80);
-    ctx.fillStyle=p.color;
-    ctx.fillRect(p.x,p.y,3,3);
-
-    if(p.life<=0) particles.splice(i,1);
-  }
+function drawSky(wp){
+  ctx.fillStyle=sky;ctx.fillRect(0,0,W,350);
+  for(var i=0;i<stars.length;i++){var s=stars[i];ctx.globalAlpha=.4+.6*Math.abs(Math.sin(tt*1.2+s.p));ctx.fillStyle="#fff";ctx.fillRect(((s.x-wp*.02)%W+W)%W,s.y,s.r,s.r);}
   ctx.globalAlpha=1;
+  ctx.fillStyle="#f6e9c8";ctx.beginPath();ctx.arc(690,70,22,0,7);ctx.fill();
+  ctx.fillStyle="#2a1146";ctx.beginPath();ctx.arc(700,65,20,0,7);ctx.fill();
+  var cm=wp*.2,i0=Math.floor((cm-100)/80);
+  for(var k=i0;k<i0+13;k++){
+    var bx=k*80-cm,bw=56+rnd(k,5)*26,bh=60+rnd(k,6)*95;
+    ctx.fillStyle="#1a0c2c";ctx.fillRect(bx,335-bh,bw,bh);
+    if(rnd(k,7)>.5){ctx.beginPath();ctx.moveTo(bx,335-bh);ctx.lineTo(bx+bw/2,335-bh-18);ctx.lineTo(bx+bw,335-bh);ctx.fill();}
+    for(var wy=335-bh+10;wy<325;wy+=16)for(var wx=bx+7;wx<bx+bw-8;wx+=14){if(rnd(k*31+wy,wx)>.45){ctx.fillStyle="rgba(255,196,90,.75)";ctx.fillRect(wx,wy,5,7);}}
+  }
 }
-
-/* ---------- MAIN SCENE ---------- */
-function renderGame(){
-  ctx.clearRect(0,0,800,440);
-  drawBackground();
-
-  for(var i=0;i<8;i++){
-    var x=(i*115-distance*.7%115+800)%800;
-    drawDiya(x,350);
+function drawHouses(wp){
+  var cm=wp*.7,i0=Math.floor((cm-170)/150),lt=lampTypes(),H0=335,pos=[];
+  for(var i=i0;i<i0+8;i++){
+    var hx=i*150-cm+30,w=108+rnd(i,11)*30,h=118+rnd(i,12)*58;
+    pos.push({x:hx,w:w,top:H0-h,i:i});
+    ctx.fillStyle=WALLS[((i%6)+6)%6];ctx.fillRect(hx,H0-h,w,h);
+    ctx.fillStyle="rgba(0,0,0,.28)";ctx.fillRect(hx,H0-h,w,10);
+    ctx.fillStyle="rgba(0,0,0,.18)";ctx.fillRect(hx+w-8,H0-h,8,h);
+    for(var wy=H0-h+26;wy<H0-62;wy+=36)for(var wx=hx+14;wx<hx+w-22;wx+=30){
+      var on=rnd(i*13+wy,wx)>.25;ctx.fillStyle=on?"#ffd37a":"#3a2250";ctx.fillRect(wx,wy,16,20);
+      if(on){glow(wx+8,wy+10,26,"rgba(255,190,80,.9)",.25);}
+      ctx.fillStyle="rgba(0,0,0,.3)";ctx.fillRect(wx+7,wy,2,20);
+    }
+    ctx.fillStyle="#2a1236";ctx.beginPath();ctx.moveTo(hx+w/2-14,H0);ctx.lineTo(hx+w/2-14,H0-34);ctx.arc(hx+w/2,H0-34,14,Math.PI,0);ctx.lineTo(hx+w/2+14,H0);ctx.fill();
+    ctx.fillStyle="#ffcf4a";for(var d=0;d<5;d++){ctx.fillRect(hx+8+d*((w-20)/4),H0-h-5,6,5);}
+    var lamp=(i>=0&&i<lt.length)?lt[i]:null;
+    if(lamp){
+      if(lamp==="kandil"){ctx.strokeStyle="#ffd36a";ctx.beginPath();ctx.moveTo(hx+w/2,H0-h);ctx.lineTo(hx+w/2,H0-h+16);ctx.stroke();
+        ctx.fillStyle="#ff6a3d";ctx.beginPath();ctx.moveTo(hx+w/2,H0-h+16);ctx.lineTo(hx+w/2+9,H0-h+30);ctx.lineTo(hx+w/2,H0-h+46);ctx.lineTo(hx+w/2-9,H0-h+30);ctx.fill();
+        glow(hx+w/2,H0-h+30,34,"rgba(255,120,60,.9)",.5+.1*Math.sin(tt*5+i));}
+      else{for(var q=0;q<4;q++){var dx=hx+14+q*((w-28)/3);diya(dx,H0-h-7,1,lamp);glow(dx,H0-h-12,22,"rgba(255,190,70,.9)",.4);}}
+    }
   }
-
-  drawRangoli(560,390);
-  drawRangoli(100,390);
-  drawPlayer();
-  drawParticles();
-
-  requestAnimationFrame(renderGame);
+  for(var p=0;p<pos.length-1;p++){
+    var a=pos[p],b=pos[p+1],ax=a.x+a.w*.5,ay=a.top+12,bx=b.x+b.w*.5,by=b.top+12,mx=(ax+bx)/2,my=Math.max(ay,by)+22;
+    ctx.strokeStyle="rgba(255,200,80,.6)";ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(ax,ay);ctx.quadraticCurveTo(mx,my,bx,by);ctx.stroke();
+    for(var n=1;n<10;n++){var t=n/10,x=(1-t)*(1-t)*ax+2*(1-t)*t*mx+t*t*bx,y=(1-t)*(1-t)*ay+2*(1-t)*t*my+t*t*by;
+      var c=["#ffcf4a","#ff3d81","#2fd7c4","#ff8a1f"][(n+p)%4];ctx.globalAlpha=.65+.35*Math.sin(tt*4+n+p);ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,2.4,0,7);ctx.fill();}
+    ctx.globalAlpha=1;
+  }
+  ctx.lineWidth=1;
 }
-
-/* ---------- MOVEMENT ---------- */
-function updateDistance(amount){
-  if(distance>=2000) return;
-
-  distance=Math.min(2000,distance+amount);
-  S.dist=distance;
-  S.walked=distance;
-
-  $("dist").textContent=Math.floor(distance);
-  $("fill").style.width=(distance/2000*100)+"%";
-
-  if(distance>=2000){
-    walking=false;
-    running=false;
-    $("end").classList.add("on");
-    $("endtxt").textContent="You reached the Mela Gate! Shubh Deepawali!";
-    S.coins+=100;
-    toast("Congratulations! You reached the Mela Gate!");
-    beep(880,.4);
+function drawRoad(wp){
+  var g=ctx.createLinearGradient(0,335,0,H);g.addColorStop(0,"#3b2349");g.addColorStop(.12,"#2a1833");g.addColorStop(1,"#150b22");
+  ctx.fillStyle=g;ctx.fillRect(0,335,W,H-335);
+  ctx.fillStyle="rgba(255,255,255,.05)";ctx.fillRect(0,352,W,2);
+  var k0=Math.floor((wp-AX-80)/480);
+  for(var k=k0;k<k0+3;k++){var sx=k*480+300-wp+AX;if(sx<-90||sx>W+90||k<0)continue;rangoli(sx,404,k);}
+  var d0=Math.floor((wp-AX)/56);
+  for(var d=d0;d<d0+16;d++){var x=d*56-wp+AX+10;glow(x,424,20,"rgba(255,170,50,.95)",.35);diya(x,426,1.1,"clay");}
+  for(var m=1;m<=8;m++){
+    var sx2=m*500*PXM-wp+AX+40;if(sx2<-60||sx2>W+60)continue;
+    ctx.fillStyle="#5a3a2a";ctx.fillRect(sx2,300,4,52);ctx.fillStyle="#ffcf4a";ctx.fillRect(sx2-26,290,56,22);
+    ctx.fillStyle="#2b1200";ctx.font="700 13px Mukta,sans-serif";ctx.textAlign="center";ctx.fillText(m*500+" m",sx2+2,306);
   }
-
-  save();
+  var gx=GOAL*PXM-wp+AX;
+  if(gx>-160&&gx<W+160){
+    ctx.fillStyle="#7b1530";ctx.fillRect(gx-112,210,16,142);ctx.fillRect(gx+96,210,16,142);
+    ctx.fillStyle="#a31d45";ctx.fillRect(gx-124,186,248,32);
+    ctx.fillStyle="#ffcf4a";ctx.fillRect(gx-124,186,248,4);ctx.fillRect(gx-124,214,248,4);
+    ctx.fillStyle="#ffe9a8";ctx.font="700 18px 'Yatra One',Georgia,serif";ctx.textAlign="center";ctx.fillText("DIWALI MELA",gx,208);
+    for(var b=0;b<12;b++){var bx=gx-110+b*20;ctx.globalAlpha=.6+.4*Math.sin(tt*5+b);ctx.fillStyle=["#ffcf4a","#ff3d81","#2fd7c4"][b%3];ctx.beginPath();ctx.arc(bx,226,3,0,7);ctx.fill();}
+    ctx.globalAlpha=1;glow(gx,205,120,"rgba(255,170,60,.9)",.25);
+  }
 }
-
-function startWalking(isRunning){
-  if(distance>=2000) return;
-  audio();
-  walking=true;
-  running=!!isRunning;
-  gameStarted=true;
-  beep(isRunning?660:440,.1);
+function rangoli(x,y,k){
+  ctx.save();ctx.translate(x,y);ctx.scale(1,.3);
+  var cols=["#ff3d81","#ffcf4a","#2fd7c4","#8f5bff","#ff8a1f"],o=(k%3)*.15;
+  ctx.fillStyle="rgba(255,255,255,.12)";ctx.beginPath();ctx.arc(0,0,68,0,7);ctx.fill();
+  for(var p=0;p<12;p++){ctx.save();ctx.rotate(p/12*6.283+o);ctx.fillStyle=cols[p%5];ctx.beginPath();ctx.ellipse(40,0,22,9,0,0,7);ctx.fill();ctx.restore();}
+  for(var q=0;q<8;q++){ctx.save();ctx.rotate(q/8*6.283);ctx.fillStyle=cols[(q+2)%5];ctx.beginPath();ctx.ellipse(18,0,12,6,0,0,7);ctx.fill();ctx.restore();}
+  ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(0,0,6,0,7);ctx.fill();ctx.restore();
 }
-
-function stopWalking(){
-  walking=false;
-  running=false;
+function drawAvatar(){
+  var c=G.CLOTH[G.S.wear]||G.CLOTH.kurta,sw=moving?Math.sin(phase)*.65:0,wear=G.S.wear;
+  ctx.save();ctx.translate(AX,GY);
+  ctx.fillStyle="rgba(0,0,0,.35)";ctx.beginPath();ctx.ellipse(0,26,22,6,0,0,7);ctx.fill();
+  ctx.strokeStyle=(wear==="saree"||wear==="lehenga")?c.bot:"#f3e6c8";ctx.lineWidth=7;ctx.lineCap="round";
+  ctx.beginPath();ctx.moveTo(-4,-8);ctx.lineTo(-4+Math.sin(sw)*18,22);ctx.moveTo(4,-8);ctx.lineTo(4-Math.sin(sw)*18,22);ctx.stroke();
+  ctx.strokeStyle="#b97a55";ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(-4+Math.sin(sw)*18,22);ctx.lineTo(-4+Math.sin(sw)*18+4,25);ctx.moveTo(4-Math.sin(sw)*18,22);ctx.lineTo(4-Math.sin(sw)*18+4,25);ctx.stroke();
+  ctx.fillStyle=c.top;
+  if(wear==="lehenga"){ctx.fillRect(-9,-44,18,18);ctx.fillStyle=c.bot;ctx.beginPath();ctx.moveTo(-9,-26);ctx.lineTo(9,-26);ctx.lineTo(22,16);ctx.lineTo(-22,16);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-22,12,44,4);}
+  else if(wear==="saree"){ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-46);ctx.lineTo(12,18);ctx.lineTo(-12,18);ctx.fill();ctx.fillStyle=c.trim;ctx.fillRect(-12,14,24,4);ctx.beginPath();ctx.moveTo(-9,-46);ctx.lineTo(9,-14);ctx.lineTo(9,-8);ctx.lineTo(-9,-40);ctx.fill();}
+  else if(wear==="sherwani"){ctx.fillRect(-10,-46,20,64);ctx.fillStyle=c.trim;for(var b=0;b<5;b++)ctx.fillRect(-1,-40+b*10,3,3);ctx.fillRect(-10,14,20,4);}
+  else{ctx.fillRect(-10,-46,20,52);ctx.fillStyle=c.trim;ctx.fillRect(-10,2,20,3);ctx.fillRect(-1,-46,2,16);}
+  ctx.strokeStyle=c.top;ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-9,-42);ctx.lineTo(-9-Math.sin(sw)*12,-14);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(9,-42);ctx.lineTo(9+Math.sin(sw)*12,-14);ctx.stroke();
+  ctx.fillStyle="#d9a07a";ctx.beginPath();ctx.arc(0,-56,10,0,7);ctx.fill();
+  ctx.fillStyle="#1d0f14";ctx.beginPath();ctx.arc(0,-59,10.5,Math.PI,0);ctx.fill();
+  if(wear==="saree"||wear==="lehenga"){ctx.fillRect(-11,-59,5,20);}
+  ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.arc(4,-56,1.6,0,7);ctx.fill();
+  if(V.SP.length){ctx.strokeStyle="#d9d9d9";ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(22,-34);ctx.lineTo(14,-22);ctx.stroke();glow(22,-34,22,"rgba(255,230,160,1)",.6);}
+  ctx.restore();ctx.lineWidth=1;
 }
-
-function movementLoop(){
-  if(walking){
-    updateDistance(running?3:1);
-  }
-  requestAnimationFrame(movementLoop);
+function drawFW(){
+  ctx.globalCompositeOperation="lighter";
+  for(var i=0;i<V.P.length;i++){var p=V.P[i];ctx.globalAlpha=Math.max(0,p.l/p.m);ctx.fillStyle=p.c;ctx.fillRect(p.x-p.s/2,p.y-p.s/2,p.s,p.s);}
+  ctx.globalAlpha=1;
+  for(var r=0;r<V.R.length;r++){glow(V.R[r].x,V.R[r].y,14,"#ffd36a",.9);}
+  for(var b=0;b<V.GB.length;b++){var g=V.GB[b];if(g.boomed){var k=g.t/.6;ctx.globalAlpha=Math.max(0,1-k);ctx.strokeStyle="#ffe9a8";ctx.lineWidth=3;ctx.beginPath();ctx.ellipse(g.x,396,20+k*150,6+k*34,0,0,7);ctx.stroke();glow(g.x,390,120*(1-k)+20,"#fff3c4",Math.max(0,1-k));}}
+  ctx.globalAlpha=1;ctx.lineWidth=1;ctx.globalCompositeOperation="source-over";
+  for(var b2=0;b2<V.GB.length;b2++){var q=V.GB[b2];if(!q.boomed){ctx.fillStyle="#c1121f";ctx.fillRect(q.x-5,380,10,16);ctx.fillStyle="#ffcf4a";ctx.fillRect(q.x-5,386,10,3);ctx.strokeStyle="#ffcf4a";ctx.beginPath();ctx.moveTo(q.x,380);ctx.lineTo(q.x+5,372);ctx.stroke();}}
+  for(var c=0;c<V.CH.length;c++){var ch=V.CH[c];ctx.fillStyle="#ffcf4a";ctx.beginPath();ctx.ellipse(ch.x,396,9,3,0,0,7);ctx.fill();}
 }
-
-$("walk").addEventListener("click",function(){
-  startWalking(false);
+var last=performance.now(),uiT=0;
+function frame(now){
+  var dt=Math.min(.05,(now-last)/1000);last=now;tt+=dt;
+  var S=G.S,run=runHeld||keyR,go=walkHeld||keyW||run||$("auto").checked;
+  var v=go?(run?24:14):0;moving=v>0;
+  if(moving){S.dist+=v*dt;S.walked+=v*dt;phase+=v*dt*.75;}
+  G.stepFW(dt);
+  if(G.update)G.update(dt);
+  var wp=S.dist*PXM,sh=G.getShake();
+  ctx.setTransform(1.5,0,0,1.5,0,0);
+  if(sh>0)ctx.translate((Math.random()-.5)*sh,(Math.random()-.5)*sh);
+  drawSky(wp);drawHouses(wp);drawRoad(wp);drawAvatar();drawFW();
+  var fl=G.getFlash();if(fl>0){ctx.globalAlpha=Math.min(.55,fl*.6);ctx.fillStyle="#fff5d6";ctx.fillRect(-20,-20,W+40,H+40);ctx.globalAlpha=1;}
+  ctx.textAlign="start";
+  uiT+=dt;if(uiT>.1){uiT=0;$("dist").textContent=Math.floor(S.dist);$("fill").style.width=Math.min(100,S.dist/GOAL*100)+"%";}
+  requestAnimationFrame(frame);
+}
+function hold(btn,on){
+  btn.addEventListener("pointerdown",function(e){e.preventDefault();G.ac();on(true);btn.classList.add("hold");try{btn.setPointerCapture(e.pointerId)}catch(x){}});
+  ["pointerup","pointercancel","pointerleave"].forEach(function(ev){btn.addEventListener(ev,function(){on(false);btn.classList.remove("hold");});});
+}
+hold($("walk"),function(v){walkHeld=v});hold($("run"),function(v){runHeld=v});
+window.addEventListener("keydown",function(e){
+  var t=e.target&&e.target.tagName;if(t==="INPUT"||t==="TEXTAREA")return;
+  if(e.key==="ArrowRight"||e.key==="d"||e.key==="D"){keyW=true;keyR=e.shiftKey;G.ac();e.preventDefault();}
+  if(e.key==="Shift")keyR=keyW;
+  var n=parseInt(e.key,10);if(n>=1&&n<=5&&G.fireKey)G.fireKey(n-1);
 });
-
-$("run").addEventListener("click",function(){
-  startWalking(true);
+window.addEventListener("keyup",function(e){
+  if(e.key==="ArrowRight"||e.key==="d"||e.key==="D")keyW=false;
+  if(e.key==="Shift")keyR=false;
 });
+window.addEventListener("blur",function(){keyW=false;keyR=false;});
+requestAnimationFrame(frame);
+})();
+</script>
+<script>
+(function(){
+"use strict";
+var G=window.__G,$=G.$,SFX=G.SFX;
+function st(){return G.S}
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;}
+function coinsUI(){$("coins").textContent=st().coins;}
+function clean(s,n){return String(s==null?"":s).replace(/[\u0000-\u001f\u007f​-‏‪-‮⁠-⁯﻿]/g,"").trim().slice(0,n);}
 
-$("auto").addEventListener("change",function(){
-  if(this.checked) startWalking(false);
-  else stopWalking();
-});
+/* ---------- tabs ---------- */
+var tabs=document.querySelectorAll(".tabs > .tab[data-p]");
+tabs.forEach(function(t){t.addEventListener("click",function(){
+  tabs.forEach(function(x){var on=x===t;x.setAttribute("aria-selected",on?"true":"false");$("p-"+x.dataset.p).hidden=!on;});
+  G.ac();
+});});
 
-cv.addEventListener("click",function(){
-  launchFirework();
-  audio();
-  beep(520,.12);
-});
-
-document.addEventListener("keydown",function(e){
-  if(e.key===" "){
-    startWalking(false);
-  }
-  if(e.key==="Shift"){
-    startWalking(true);
-  }
-  if("12345".includes(e.key)){
-    launchFirework();
-  }
-});
-
-document.addEventListener("keyup",function(e){
-  if(e.key===" "||e.key==="Shift"){
-    stopWalking();
-  }
-});
-
-/* ---------- START ANIMATION ---------- */
-setInterval(function(){
-  if(Math.random()<.35) launchFirework();
-},1800);
-
-renderGame();
-movementLoop();
-  /* ---------- GAME DATA ---------- */
-
-S.coins = S.coins || 100;
-S.completedTasks = S.completedTasks || [];
-S.wear = S.wear || "kurta";
-
-var diwaliTasks = [
-  {
-    id: "clean",
-    title: "Clean Your Home",
-    description: "Get your home ready for Diwali.",
-    reward: 30,
-    emoji: "🧹"
-  },
-  {
-    id: "rangoli",
-    title: "Create a Rangoli",
-    description: "Decorate your entrance with a colourful rangoli.",
-    reward: 40,
-    emoji: "🎨"
-  },
-  {
-    id: "diya",
-    title: "Light the Diyas",
-    description: "Light diyas and brighten your street.",
-    reward: 30,
-    emoji: "🪔"
-  },
-  {
-    id: "sweets",
-    title: "Prepare Sweets",
-    description: "Prepare delicious Diwali sweets.",
-    reward: 35,
-    emoji: "🍬"
-  },
-  {
-    id: "decoration",
-    title: "Decorate Your Home",
-    description: "Add lights and decorations to your home.",
-    reward: 45,
-    emoji: "✨"
-  },
-  {
-    id: "puja",
-    title: "Perform Diwali Puja",
-    description: "Offer prayers for happiness and prosperity.",
-    reward: 50,
-    emoji: "🙏"
-  }
+/* ---------- tasks ---------- */
+var TASKS=[
+ {n:"Walk 400 m to the rangoli chowk",par:45,kind:"walk",need:400,tip:"Hold Walk or Run on the street."},
+ {n:"Light 6 diyas at your doorstep",par:25,kind:"diya",need:6,tip:"Tap the lamps below."},
+ {n:"Pray at all three shrines",par:70,kind:"pray",need:3,tip:"Ganesh, Laxmi and Saraswati, in the Mandir tab."},
+ {n:"Burst 5 crackers",par:35,kind:"crack",need:5,tip:"Use the Crackers tab or keys 1 to 5."},
+ {n:"Walk 800 m on towards the Mela gate",par:80,kind:"walk",need:800,tip:"Run to save time."}
 ];
-
-/* ---------- CREATE EXTRA GAME UI ---------- */
-
-var extraStyle = document.createElement("style");
-extraStyle.textContent = `
-.extra-panel {
-  background:rgba(35,18,48,.96);
-  color:#fff;
-  border:1px solid #e6ad48;
-  border-radius:14px;
-  padding:15px;
-  margin:12px 0;
+function mult(e,par){var r=e/par;if(r<=.5)return 2;if(r>=2)return .25;return 2-(r-.5)*(1.75/1.5);}
+function bless(){return 1+.1*Object.keys(st().blessed).length;}
+function prog(t){var s=st(),b=s.base;
+  if(t.kind==="walk")return Math.min(t.need,Math.floor(s.walked-b.walked));
+  if(t.kind==="diya")return Math.min(t.need,s.diyas-b.diyas);
+  if(t.kind==="pray")return Math.min(t.need,(s.prays||0)-(b.prays||0));
+  return Math.min(t.need,s.bursts-b.bursts);}
+function nowCoins(t){return Math.round(100*mult(st().el||0,t.par)*bless());}
+function startTask(){var s=st();s.run=true;s.el=0;s.base={walked:s.walked,bursts:s.bursts,diyas:s.diyas,prays:s.prays||0};
+  renderTasks();G.toast("Task started. Go!");SFX.clink();G.save();}
+function finishTask(){
+  var s=st(),t=TASKS[s.ti],m=mult(s.el,t.par),c=Math.round(100*m*bless());
+  s.coins+=c;s.res.push({c:c,m:m,e:s.el});s.run=false;s.ti++;s.el=0;
+  SFX.coin();coinsUI();G.toast("Task done! +"+c+" coins (x"+(m*bless()).toFixed(2)+")");
+  G.FW.rocket(false,.3);setTimeout(function(){G.FW.rocket(false,.7)},250);
+  renderTasks();G.save();
 }
-.extra-panel h3 {
-  color:#ffd36a;
-  margin:0 0 12px;
-}
-.extra-button {
-  background:linear-gradient(135deg,#f6b83f,#e76b26);
-  border:0;
-  border-radius:9px;
-  padding:10px 14px;
-  color:#32152c;
-  font-weight:bold;
-  cursor:pointer;
-  margin:4px;
-}
-.extra-button:disabled {
-  opacity:.45;
-  cursor:not-allowed;
-}
-.extra-task {
-  background:rgba(255,255,255,.08);
-  border-radius:9px;
-  padding:10px;
-  margin:8px 0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-.extra-task small {
-  display:block;
-  opacity:.75;
-  margin-top:4px;
-}
-.extra-overlay {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.75);
-  z-index:9999;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:15px;
-}
-.extra-overlay.show {
-  display:flex;
-}
-.extra-modal {
-  background:#281638;
-  color:white;
-  border:2px solid #e6ad48;
-  border-radius:16px;
-  padding:22px;
-  width:min(430px,95vw);
-  max-height:85vh;
-  overflow:auto;
-  text-align:center;
-}
-.extra-modal h2 {
-  color:#ffd36a;
-}
-.extra-modal button {
-  margin:5px;
-}
-.extra-products {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-}
-.extra-product {
-  background:rgba(255,255,255,.08);
-  border-radius:10px;
-  padding:12px;
-}
-.extra-product .emoji {
-  font-size:30px;
-}
-`;
-document.head.appendChild(extraStyle);
-
-/* ---------- ADD GAME PANELS ---------- */
-
-var extraContainer = document.createElement("div");
-extraContainer.id = "extraGamePanels";
-extraContainer.innerHTML = `
-  <div class="extra-panel">
-    <h3>🪔 Diwali Activities</h3>
-    <div id="extraTaskList"></div>
-    <p id="extraTaskProgress">0 / 6 activities completed</p>
-  </div>
-
-  <div class="extra-panel">
-    <h3>🛍️ Diwali Shopping</h3>
-    <p>Coins: <strong id="extraCoins">100</strong> 🪙</p>
-    <button class="extra-button" id="openShop">Open Shop</button>
-    <button class="extra-button" id="openPuja">Visit Puja Area</button>
-  </div>
-`;
-
-var mainTarget =
-  document.querySelector("main") ||
-  document.querySelector(".container") ||
-  document.querySelector("#app") ||
-  document.body;
-
-mainTarget.appendChild(extraContainer);
-
-/* ---------- TASK RENDERING ---------- */
-
 function renderTasks(){
-  var list = document.getElementById("extraTaskList");
-  if(!list) return;
-
-  list.innerHTML = "";
-
-  diwaliTasks.forEach(function(task){
-    var completed = S.completedTasks.includes(task.id);
-
-    var item = document.createElement("div");
-    item.className = "extra-task";
-
-    var info = document.createElement("div");
-    info.innerHTML =
-      "<strong>" + task.emoji + " " + task.title + "</strong>" +
-      "<small>" + task.description + "</small>" +
-      "<small>Reward: " + task.reward + " coins</small>";
-
-    var button = document.createElement("button");
-    button.className = "extra-button";
-    button.textContent = completed ? "Completed ✓" : "Complete";
-    button.disabled = completed;
-
-    button.addEventListener("click",function(){
-      completeTask(task.id);
-    });
-
-    item.appendChild(info);
-    item.appendChild(button);
-    list.appendChild(item);
+  var s=st(),box=$("tasklist");box.textContent="";
+  TASKS.forEach(function(t,i){
+    var row=el("div","task"+(i===s.ti?" act":"")+(i<s.ti?" done":""));
+    row.appendChild(el("div","tn",i<s.ti?"✓":String(i+1)));
+    var b=el("div","tbody");b.appendChild(el("b",null,t.n));
+    if(i<s.ti){var r=s.res[i];b.appendChild(el("small",null,"Done in "+Math.round(r.e)+"s of "+t.par+"s · earned "+r.c+" coins"));}
+    else if(i===s.ti&&s.run){var sm=el("small");sm.id="tlive";b.appendChild(sm);
+      if(t.kind==="diya"){var dw=el("div","diyas");dw.style.marginTop="8px";
+        for(var d=0;d<t.need;d++)(function(d){var bt=el("button","diya");bt.type="button";bt.setAttribute("aria-label","Light diya "+(d+1));
+          bt.textContent="🪔";bt.addEventListener("click",function(){if(bt.classList.contains("lit"))return;bt.classList.add("lit");st().diyas++;SFX.clink();G.save();});dw.appendChild(bt);})(d);
+        b.appendChild(dw);}}
+    else b.appendChild(el("small",null,"Target "+t.par+"s · "+t.tip));
+    row.appendChild(b);
+    if(i===s.ti&&!s.run){var go=el("button","btn pri","Start");go.type="button";go.addEventListener("click",startTask);row.appendChild(go);}
+    box.appendChild(row);
   });
-
-  var count = S.completedTasks.length;
-  var progress = document.getElementById("extraTaskProgress");
-
-  if(progress){
-    progress.textContent =
-      count + " / " + diwaliTasks.length + " activities completed";
-  }
-
-  updateCoins();
+  var done=s.ti>=TASKS.length;$("end").classList.toggle("on",done);
+  if(done){var tot=s.res.reduce(function(a,r){return a+r.c},0);$("endtxt").textContent="All five tasks done. You earned "+tot+" coins from tasks and now hold "+s.coins+". Keep walking to the Mela gate, burst the rest of your crackers or shop for lamps and clothes.";}
+  liveTask();
 }
-
-/* ---------- COMPLETE TASK ---------- */
-
-function completeTask(taskId){
-  if(S.completedTasks.includes(taskId)){
-    toast("You have already completed this activity!");
-    return;
-  }
-
-  var task = diwaliTasks.find(function(t){
-    return t.id === taskId;
-  });
-
-  if(!task) return;
-
-  S.completedTasks.push(taskId);
-  S.coins += task.reward;
-
-  toast(task.title + " completed! +" + task.reward + " coins");
-  beep(700,.2);
-  burst(400,170,"#ffd36a");
-
-  save();
-  renderTasks();
+function liveTask(){
+  var s=st(),t=TASKS[s.ti],tm=$("timer");
+  if(!t||!s.run){tm.textContent="--";return;}
+  tm.textContent=Math.floor(s.el)+"s / "+t.par+"s";
+  var l=$("tlive");if(l){l.textContent="";var p=prog(t);l.appendChild(document.createTextNode(p+" / "+t.need+" · coins if you finish now: "));var b=el("span","live",String(nowCoins(t)));l.appendChild(b);}
 }
+$("again").addEventListener("click",function(){G.setS(Object.assign({},freshState()));coinsUI();renderAll();});
+function freshState(){return {coins:50,dist:0,walked:0,gateDone:false,inv:{rocket:2,laxmi:1,shots:1,spark:2,chakri:0},lamps:{clay:0,brass:0,kandil:0},own:["kurta"],wear:"kurta",blessed:{},bursts:0,diyas:0,prays:0,ti:0,el:0,run:false,base:{walked:0,bursts:0,diyas:0,prays:0},res:[]};}
+var acc=0,saveAcc=0;
+G.update=function(dt){
+  var s=st();acc+=dt;saveAcc+=dt;
+  if(s.run){s.el=(s.el||0)+dt;var t=TASKS[s.ti];if(t&&prog(t)>=t.need){finishTask();}}
+  if(acc>.25){acc=0;liveTask();}
+  if(saveAcc>3){saveAcc=0;G.save();}
+  if(!s.gateDone&&s.dist>=2000){s.gateDone=true;s.coins+=60;coinsUI();G.toast("You reached the Diwali Mela gate! +60 coins");
+    [.2,.4,.6,.8].forEach(function(x,i){setTimeout(function(){G.FW.rocket(false,x)},i*300);});SFX.coin();G.save();}
+};
 
-/* ---------- COINS ---------- */
-
-function updateCoins(){
-  var coinDisplay = document.getElementById("extraCoins");
-  if(coinDisplay){
-    coinDisplay.textContent = S.coins;
-  }
-
-  var oldCoinDisplay = $("coins");
-  if(oldCoinDisplay){
-    oldCoinDisplay.textContent = S.coins;
-  }
-}
-
-/* ---------- SHOP ---------- */
-
-var shopItems = [
-  {id:"kurta",name:"Traditional Kurta",emoji:"👘",price:50},
-  {id:"saree",name:"Beautiful Saree",emoji:"🥻",price:80},
-  {id:"lehenga",name:"Festive Lehenga",emoji:"💃",price:100},
-  {id:"dhoti",name:"Traditional Outfit",emoji:"🧥",price:40}
+/* ---------- crackers ---------- */
+var CR=[
+ {id:"rocket",n:"Rocket",d:"Whistles up and blooms"},
+ {id:"laxmi",n:"Laxmi bomb",d:"One huge bang, shakes the street"},
+ {id:"shots",n:"Sky shots",d:"Five shots in a row"},
+ {id:"chakri",n:"Chakri",d:"Ground spinner of sparks"},
+ {id:"spark",n:"Phooljhari",d:"Sparkler in your hand"}
 ];
-
-var shopOverlay = document.createElement("div");
-shopOverlay.className = "extra-overlay";
-shopOverlay.id = "shopOverlay";
-
-shopOverlay.innerHTML = `
-  <div class="extra-modal">
-    <h2>🛍️ Diwali Fashion Shop</h2>
-    <p>Choose an outfit for the celebration!</p>
-    <p>Coins: <strong id="shopCoins">100</strong> 🪙</p>
-    <div class="extra-products" id="shopProducts"></div>
-    <button class="extra-button" id="closeShop">Close Shop</button>
-  </div>
-`;
-
-document.body.appendChild(shopOverlay);
-
-function renderShop(){
-  var products = document.getElementById("shopProducts");
-  if(!products) return;
-
-  products.innerHTML = "";
-
-  shopItems.forEach(function(item){
-    var owned = S.wear === item.id;
-
-    var card = document.createElement("div");
-    card.className = "extra-product";
-
-    card.innerHTML =
-      '<div class="emoji">' + item.emoji + '</div>' +
-      '<strong>' + item.name + '</strong>' +
-      '<p>' + item.price + ' coins</p>';
-
-    var button = document.createElement("button");
-    button.className = "extra-button";
-    button.textContent = owned ? "Wearing ✓" : "Buy / Wear";
-
-    button.disabled = owned;
-
-    button.addEventListener("click",function(){
-      buyOutfit(item);
-    });
-
-    card.appendChild(button);
-    products.appendChild(card);
+var nr=null,nick="";
+function fire(id){
+  var s=st();G.ac();
+  if(!(s.inv[id]>0)){G.toast("Out of "+id+". Buy more in the Shop.");return;}
+  s.inv[id]--;s.bursts++;
+  var xf=(id==="rocket"||id==="shots")?.15+Math.random()*.7:null;
+  G.FW[id](false,xf);
+  if(nr){try{nr.emit("burst",{k:id,x:xf,n:nick}).catch(function(){});}catch(e){}}
+  renderCrackers();renderShop();G.save();
+}
+G.fireKey=function(i){if(CR[i])fire(CR[i].id);};
+function renderCrackers(){
+  var g=$("crgrid");g.textContent="";
+  CR.forEach(function(c,i){
+    var card=el("div","card"),r=el("div","row");r.appendChild(el("b",null,(i+1)+". "+c.n));r.appendChild(el("span","price","x"+st().inv[c.id]));
+    card.appendChild(r);card.appendChild(el("span","muted",c.d));
+    var b=el("button","btn pri","Burst!");b.type="button";b.disabled=!(st().inv[c.id]>0);b.addEventListener("click",function(){fire(c.id)});card.appendChild(b);g.appendChild(card);
   });
-
-  var shopCoins = document.getElementById("shopCoins");
-  if(shopCoins) shopCoins.textContent = S.coins;
 }
 
-function buyOutfit(item){
-  if(S.wear === item.id){
-    toast("You are already wearing this outfit!");
-    return;
-  }
-
-  if(S.coins < item.price){
-    toast("Not enough coins! Complete more activities.");
-    return;
-  }
-
-  S.coins -= item.price;
-  S.wear = item.id;
-
-  toast("You are now wearing " + item.name + "!");
-  beep(600,.2);
-
-  save();
-  renderShop();
-  updateCoins();
+/* ---------- mandir ---------- */
+var SH=[
+ {k:"ganesh",n:"Ganesh",h:"श्री गणेश",m:"ॐ गं गणपतये नमः",t:"Om Gam Ganapataye Namah",
+  svg:'<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#3a2060" stroke="#ffc83d" stroke-width="2"/><path d="M50 16C54 28 76 36 76 58C76 74 63 84 50 84C37 84 24 74 24 58C24 36 46 28 50 16Z" fill="#ffd36a"/><path d="M38 44L42 74M50 38V78M62 44L58 74" stroke="#c98a1c" stroke-width="2.5" fill="none"/><circle cx="50" cy="14" r="4" fill="#e8317a"/></svg>'},
+ {k:"laxmi",n:"Laxmi",h:"श्री लक्ष्मी",m:"ॐ श्रीं महालक्ष्म्यै नमः",t:"Om Shreem Mahalakshmyai Namah",
+  svg:'<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#3a2060" stroke="#ffc83d" stroke-width="2"/><g fill="#e8317a" stroke="#ffd1e4" stroke-width="1.5"><ellipse cx="50" cy="44" rx="8" ry="22" transform="rotate(-62 50 72)"/><ellipse cx="50" cy="44" rx="8" ry="22" transform="rotate(62 50 72)"/><ellipse cx="50" cy="44" rx="8" ry="22" transform="rotate(-31 50 72)"/><ellipse cx="50" cy="44" rx="8" ry="22" transform="rotate(31 50 72)"/><ellipse cx="50" cy="42" rx="8" ry="24"/></g><path d="M26 76Q50 66 74 76Q50 86 26 76Z" fill="#19b3a6"/></svg>'},
+ {k:"saraswati",n:"Saraswati",h:"श्री सरस्वती",m:"ॐ ऐं सरस्वत्यै नमः",t:"Om Aim Saraswatyai Namah",
+  svg:'<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="46" fill="#3a2060" stroke="#ffc83d" stroke-width="2"/><path d="M26 76L72 28" stroke="#ffd36a" stroke-width="5" stroke-linecap="round"/><circle cx="26" cy="76" r="13" fill="#c98a1c" stroke="#ffd36a" stroke-width="2"/><circle cx="72" cy="28" r="9" fill="#c98a1c" stroke="#ffd36a" stroke-width="2"/><path d="M34 70L66 36M30 66L62 32" stroke="#fff2c9" stroke-width="1"/><path d="M78 74q6-8 0-16" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>'}
+];
+var STEPS=["Offer a flower","Light the diya","Ring the bell"],rit={ganesh:0,laxmi:0,saraswati:0};
+function renderMandir(){
+  var box=$("shrines");box.textContent="";
+  SH.forEach(function(s){
+    var c=el("div","card shrine");c.insertAdjacentHTML("beforeend",s.svg);
+    c.appendChild(el("h3",null,s.n));c.appendChild(el("div","mantra",s.m));c.appendChild(el("small","muted",s.t));
+    var pips=el("div","pips");for(var i=0;i<3;i++)pips.appendChild(el("i","pip"+(i<rit[s.k]?" on":"")));c.appendChild(pips);
+    var stp=el("div","steps");
+    STEPS.forEach(function(name,i){var b=el("button","btn",name);b.type="button";b.disabled=rit[s.k]!==i;b.addEventListener("click",function(){doStep(s,i)});stp.appendChild(b);});
+    c.appendChild(stp);
+    c.appendChild(el("div",st().blessed[s.k]?"blessed":"muted",st().blessed[s.k]?"Blessed · +10% coins":"Not yet blessed"));
+    box.appendChild(c);
+  });
+}
+function doStep(s,i){
+  G.ac();if(i===0)SFX.clink();else if(i===1)SFX.fizz();else SFX.bell();
+  rit[s.k]=i+1;
+  if(rit[s.k]>=3){rit[s.k]=0;var q=st();q.prays=(q.prays||0)+1;
+    if(!q.blessed[s.k]){q.blessed[s.k]=true;G.toast(s.n+" blesses you: +10% coins on tasks");}else G.toast("Your prayer to "+s.n+" is complete.");
+    G.save();}
+  renderMandir();
 }
 
-document.getElementById("openShop").addEventListener("click",function(){
-  shopOverlay.classList.add("show");
-  renderShop();
-});
-
-document.getElementById("closeShop").addEventListener("click",function(){
-  shopOverlay.classList.remove("show");
-});
-
-/* ---------- PUJA AREA ---------- */
-
-var pujaOverlay = document.createElement("div");
-pujaOverlay.className = "extra-overlay";
-pujaOverlay.id = "pujaOverlay";
-
-pujaOverlay.innerHTML = `
-  <div class="extra-modal">
-    <div style="font-size:65px">🪔</div>
-    <h2>Happy Diwali!</h2>
-    <p>May this festival bring happiness, peace and prosperity to your home.</p>
-    <p>Light a diya and celebrate the spirit of Diwali.</p>
-    <button class="extra-button" id="lightPujaDiya">Light Diya 🪔</button>
-    <button class="extra-button" id="closePuja">Close</button>
-  </div>
-`;
-
-document.body.appendChild(pujaOverlay);
-
-document.getElementById("openPuja").addEventListener("click",function(){
-  pujaOverlay.classList.add("show");
-});
-
-document.getElementById("closePuja").addEventListener("click",function(){
-  pujaOverlay.classList.remove("show");
-});
-
-document.getElementById("lightPujaDiya").addEventListener("click",function(){
-  completeTask("puja");
-  burst(400,150,"#ffcf4a");
-  beep(880,.3);
-});
-
-/* ---------- INITIALIZE PART 3 ---------- */
-
-renderTasks();
-updateCoins();
-  /* ---------- SAVE GAME PROGRESS ---------- */
-
-var SAVE_KEY = "darpan_diwali_game_save";
-
-function saveGameProgress(){
-  try{
-    localStorage.setItem(SAVE_KEY,JSON.stringify({
-      coins:S.coins,
-      wear:S.wear,
-      completedTasks:S.completedTasks,
-      distance:distance
-    }));
-  }catch(error){
-    console.warn("Could not save game progress:",error);
-  }
+/* ---------- shop ---------- */
+var SHOP={
+ clothes:Object.keys(G.CLOTH).map(function(k){return {id:k,n:G.CLOTH[k].name,p:G.CLOTH[k].price,col:G.CLOTH[k].top,col2:G.CLOTH[k].bot};}),
+ lamps:[{id:"clay",n:"Clay diya",p:40,col:"#b5562a",d:"Decorates one more house"},{id:"brass",n:"Brass diya",p:90,col:"#d9a441",d:"Bigger, golden glow"},{id:"kandil",n:"Akash kandil",p:120,col:"#ff6a3d",d:"Hanging star lantern"}],
+ crackers:[{id:"rocket",n:"Rocket",p:30,col:"#ff3d81"},{id:"laxmi",n:"Laxmi bomb",p:50,col:"#c1121f"},{id:"shots",n:"Sky shots",p:40,col:"#8f5bff"},{id:"chakri",n:"Chakri",p:20,col:"#ff8a1f"},{id:"spark",n:"Phooljhari",p:15,col:"#fff2c9"}]
+};
+var cat="clothes";
+document.querySelectorAll("#shoptabs .tab").forEach(function(t){t.addEventListener("click",function(){
+  cat=t.dataset.c;document.querySelectorAll("#shoptabs .tab").forEach(function(x){x.setAttribute("aria-selected",x===t?"true":"false")});renderShop();});});
+function buy(c,it){
+  var s=st();if(s.coins<it.p){G.toast("Not enough coins yet. Finish a task!");return;}
+  s.coins-=it.p;
+  if(c==="clothes"){s.own.push(it.id);s.wear=it.id;}
+  else if(c==="lamps")s.lamps[it.id]++;
+  else s.inv[it.id]++;
+  SFX.coin();coinsUI();G.toast("Bought "+it.n);G.save();renderShop();renderCrackers();
 }
-
-/* ---------- LOAD SAVED PROGRESS ---------- */
-
-function loadGameProgress(){
-  try{
-    var saved = localStorage.getItem(SAVE_KEY);
-
-    if(!saved) return;
-
-    var data = JSON.parse(saved);
-
-    if(typeof data.coins === "number"){
-      S.coins = data.coins;
+function renderShop(){
+  var g=$("shopgrid"),s=st();g.textContent="";
+  SHOP[cat].forEach(function(it){
+    var card=el("div","card"),r=el("div","row"),sw=el("div","sw");sw.style.background=it.col2?"linear-gradient(180deg,"+it.col+" 50%,"+it.col2+" 50%)":it.col;
+    r.appendChild(sw);var nm=el("div");nm.style.flex="1";nm.appendChild(el("b",null,it.n));if(it.d)nm.appendChild(el("small","muted",it.d)).style.display="block";r.appendChild(nm);
+    r.appendChild(el("span","price",it.p?"🪙 "+it.p:"Free"));card.appendChild(r);
+    var b;
+    if(cat==="clothes"){
+      if(s.own.indexOf(it.id)>=0){b=el("button","btn",s.wear===it.id?"Wearing":"Wear");b.disabled=s.wear===it.id;b.addEventListener("click",function(){s.wear=it.id;G.save();renderShop();});}
+      else{b=el("button","btn pri","Buy");b.disabled=s.coins<it.p;b.addEventListener("click",function(){buy(cat,it)});}
+    }else{
+      card.appendChild(el("small","muted","You have "+(cat==="lamps"?s.lamps[it.id]:s.inv[it.id])));
+      b=el("button","btn pri","Buy 1");b.disabled=s.coins<it.p;b.addEventListener("click",function(){buy(cat,it)});
     }
-
-    if(typeof data.wear === "string"){
-      S.wear = data.wear;
-    }
-
-    if(Array.isArray(data.completedTasks)){
-      S.completedTasks = data.completedTasks;
-    }
-
-    if(typeof data.distance === "number"){
-      distance = Math.min(2000,Math.max(0,data.distance));
-      S.dist = distance;
-      S.walked = distance;
-    }
-  }catch(error){
-    console.warn("Could not load saved progress:",error);
-  }
+    b.type="button";card.appendChild(b);g.appendChild(card);
+  });
 }
+var _coinsUI=coinsUI;coinsUI=function(){_coinsUI();renderShop();};
 
-/* ---------- CONNECT SAVE FUNCTIONS ---------- */
 
-// Save whenever the game changes.
-var originalSaveFunction = typeof save === "function" ? save : null;
-
-function save(){
-  if(originalSaveFunction){
+/* ---------- chat rooms ---------- */
+var ROOMS=[{id:"chowk",n:"Rangoli Chowk",b:"Meet and greet"},{id:"mithai",n:"Mithai Mandap",b:"Sweets and gossip"},{id:"ghat",n:"Aarti Ghat",b:"Evening prayers"}];
+var cur=null,unsubs=[],botT=0,lastSend=0,CRN={rocket:"rocket",laxmi:"Laxmi bomb",shots:"sky shots",chakri:"chakri"};
+nick="Guest"+(100+Math.floor(Math.random()*900));
+function hue(s){var h=0;for(var i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))%360;return "hsl("+h+",70%,72%)";}
+function addMsg(who,text,cls){
+  var log=$("log"),m=el("div","msg"+(cls?" "+cls:""));
+  if(who){var w=el("span","who",who);w.style.color=hue(who);m.appendChild(w);}
+  m.appendChild(document.createTextNode(text));log.appendChild(m);
+  while(log.children.length>150)log.removeChild(log.firstChild);
+  log.scrollTop=log.scrollHeight;
+}
+function sys(t){addMsg("",t,"sys");}
+function renderRooms(){
+  var box=$("rooms");box.textContent="";
+  ROOMS.forEach(function(r){
+    var b=el("button","room");b.type="button";b.setAttribute("aria-pressed",cur===r.id?"true":"false");
+    b.appendChild(el("b",null,r.n));var s=el("small","muted",r.b);s.style.display="block";b.appendChild(s);
+    b.addEventListener("click",function(){joinRoom(r)});box.appendChild(b);
+  });
+}
+function leaveRoom(){
+  unsubs.forEach(function(u){try{u()}catch(e){}});unsubs=[];
+  if(nr){try{nr.leave().catch(function(){})}catch(e){}nr=null;}
+  clearInterval(botT);
+}
+function onChat(msg){
+  var d=(msg&&msg.data)||{},name=clean(d.n,14)||"Guest",text=clean(d.t,140);if(!text)return;
+  addMsg(name+(msg.isMe?" (you)":""),text);
+}
+function onBurst(msg){
+  if(msg.isMe)return;var d=msg.data||{};
+  if(!CRN[d.k])return;
+  var xf=(typeof d.x==="number"&&d.x>=0&&d.x<=1)?d.x:null;
+  G.FW[d.k](true,xf);sys((clean(d.n,14)||"Someone")+" lit a "+CRN[d.k]);
+}
+function onPeers(ch){var r=ROOMS.filter(function(x){return x.id===cur})[0];
+  $("chatstat").textContent="Live in "+(r?r.n:"room")+" · "+ch.peers.length+" here now";}
+async function joinRoom(r){
+  leaveRoom();cur=r.id;renderRooms();$("log").textContent="";G.ac();
+  $("chatstat").textContent="Joining "+r.n+"…";
+  var api=null;
+  try{api=(window.claude&&window.claude.use)?await window.claude.use("room"):null;}catch(e){api=null;}
+  if(cur!==r.id)return;
+  if(api){
     try{
-      originalSaveFunction();
-    }catch(error){
-      console.warn("Original save function failed:",error);
-    }
+      var n=await api.join("diwali-"+r.id);
+      if(cur!==r.id){try{n.leave()}catch(e){}return;}
+      nr=n;
+      unsubs.push(n.on("chat",onChat));unsubs.push(n.on("burst",onBurst));unsubs.push(n.onPeers(onPeers));
+      n.presence({n:clean(nick,14)});
+      sys("You are in "+r.n+". Anyone with this page open in this room sees your messages and rockets.");
+      return;
+    }catch(e){}
   }
-
-  saveGameProgress();
+  solo(r);
 }
-
-/* ---------- UPDATE GAME DISPLAY ---------- */
-
-function refreshGameDisplay(){
-  updateCoins();
-  renderTasks();
-  renderShop();
-
-  var distanceDisplay = $("dist");
-  if(distanceDisplay){
-    distanceDisplay.textContent = Math.floor(distance);
-  }
-
-  var progressBar = $("fill");
-  if(progressBar){
-    progressBar.style.width = (distance/2000*100)+"%";
-  }
+function solo(r){
+  $("chatstat").textContent="Solo mode in "+r.n+". Live rooms need you signed in to Claude with this page open there. Festival neighbours (bots) keep you company.";
+  sys("Joined "+r.n+" (bots only).");
+  var lines=[["Meera (bot)","Shubh Deepawali everyone! The street looks stunning."],["Arjun (bot)","Just lit a laxmi bomb, the whole gali shook."],["Kavya (bot)","The rangoli near the chowk is my favourite so far."],["Meera (bot)","Don't forget the Laxmi pooja before the crackers."],["Arjun (bot)","Anyone racing to the Mela gate? I'm running."],["Kavya (bot)","Saving coins for a lehenga, wish me luck!"],["Arjun (bot)","Happy Diwali! Have some mithai."]];
+  var i=0;botT=setInterval(function(){var l=lines[i++%lines.length];addMsg(l[0],l[1]);},6500);
 }
-
-/* ---------- RESET GAME ---------- */
-
-var resetButton = document.createElement("button");
-resetButton.className = "extra-button";
-resetButton.textContent = "Reset Game";
-resetButton.style.marginTop = "12px";
-
-extraContainer.appendChild(resetButton);
-
-resetButton.addEventListener("click",function(){
-  var confirmed = confirm(
-    "Are you sure you want to restart your Diwali game? Your saved progress will be lost."
-  );
-
-  if(!confirmed) return;
-
-  S.coins = 100;
-  S.wear = "kurta";
-  S.completedTasks = [];
-
-  distance = 0;
-  S.dist = 0;
-  S.walked = 0;
-
-  stopWalking();
-
-  localStorage.removeItem(SAVE_KEY);
-
-  var endScreen = $("end");
-  if(endScreen){
-    endScreen.classList.remove("on");
-  }
-
-  refreshGameDisplay();
-  saveGameProgress();
-
-  toast("Your Diwali adventure has restarted!");
+$("sendf").addEventListener("submit",function(e){
+  e.preventDefault();
+  var text=clean($("msg").value,140),nw=Date.now();
+  if(!text||nw-lastSend<700)return;
+  if(!cur){sys("Pick a room on the left first.");return;}
+  lastSend=nw;nick=clean($("nick").value,14)||nick;$("msg").value="";
+  if(nr){
+    try{if(nr.connected&&!nr.connected()){sys("Reconnecting to the room, try again in a moment.");return;}
+      nr.presence({n:nick});
+      nr.emit("chat",{n:nick,t:text}).catch(function(){sys("Your access level cannot post in live rooms here.");});}catch(x){sys("Message not sent.");}
+  }else{addMsg(nick+" (you)",text);}
 });
 
-/* ---------- LOAD AND INITIALIZE ---------- */
-
-loadGameProgress();
-refreshGameDisplay();
-saveGameProgress();
-
-if(distance >= 2000){
-  var endScreen = $("end");
-  if(endScreen){
-    endScreen.classList.add("on");
-  }
+/* ---------- songs ---------- */
+function renderSongs(){
+  var box=$("songs"),on=G.music.cur();box.textContent="";
+  G.music.songs.forEach(function(s){
+    var row=el("div","song"+(on===s.id?" on playing":""));
+    var b=el("button","btn pri",on===s.id?"Stop":"Play");b.type="button";b.addEventListener("click",function(){
+      if(G.music.cur()===s.id)G.music.stop();else G.music.play(s.id);renderSongs();});
+    var m=el("div","meta");m.appendChild(el("b",null,s.name));var d=el("small","muted",s.desc);d.style.display="block";m.appendChild(d);
+    var bars=el("div","bars");for(var i=0;i<4;i++)bars.appendChild(el("i"));
+    row.appendChild(b);row.appendChild(m);row.appendChild(bars);box.appendChild(row);
+  });
 }
+$("vol").addEventListener("input",function(){G.music.vol(this.value/100);});
 
-console.log("🪔 Diwali Game Loaded Successfully!");
-
-/* ---------- END OF GAME SCRIPT ---------- */
-
+/* ---------- boot ---------- */
+function renderAll(){renderTasks();renderCrackers();renderMandir();renderShop();renderSongs();renderRooms();$("nick").value=nick;}
+$("nick").value=nick;
+coinsUI();renderAll();
+G.toast("Press Start on task 1, then hold Walk ▶");
+})();
 </script>
 
 </body>
+
 </html>
